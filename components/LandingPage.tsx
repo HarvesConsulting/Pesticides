@@ -3,7 +3,7 @@ import React from 'react';
 const topProducts = {
   fungicides: ['Зорвек Інкантія', 'Ридоміл Голд Р', 'Сігнум', 'Квадріс', 'Медян Екстра'],
   insecticides: ['Верімарк', 'Белт', 'Радіант', 'Проклейм', 'Мовенто'],
-  herbicides: ['Челендж', 'Зенкор Ліквід', 'Фюзилад Форте', 'Гезагард', 'Акваті'],
+  herbicides: ['Челендж', 'Зенкор Ліквід', 'Фюзілад Форте', 'Гезагард', 'Акваті'],
 };
 
 const FungicideIcon = () => (
@@ -49,7 +49,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ title, products, color, icon 
     'Ридоміл Голд Р',
     'Квадріс',
     'Проклейм',
-    'Фюзилад Форте',
+    'Фюзілад Форте',
     'Гезагард',
     'Акваті'
   ]);
@@ -116,12 +116,14 @@ const ProductCard: React.FC<ProductCardProps> = ({ title, products, color, icon 
 
 const LandingPage: React.FC = () => {
   return (
-    <div className="container mx-auto px-4 py-8 animate-fade-in">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 pt-4">
-        <ProductCard {...cardConfig.fungicides} />
-        <ProductCard {...cardConfig.insecticides} />
-        <div className="md:col-span-2 lg:col-span-1">
-            <ProductCard {...cardConfig.herbicides} />
+    <div className="container mx-auto px-4 animate-fade-in">
+      <div className="pt-8 pb-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <ProductCard {...cardConfig.fungicides} />
+          <ProductCard {...cardConfig.insecticides} />
+          <div className="md:col-span-2 lg:col-span-1">
+              <ProductCard {...cardConfig.herbicides} />
+          </div>
         </div>
       </div>
     </div>
