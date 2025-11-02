@@ -94,13 +94,16 @@ const ProductCard: React.FC<ProductCardProps> = ({ title, products, color, icon 
                 {title}
             </h3>
         </div>
-        <ul className="space-y-1 px-4 pb-4 flex-grow">
+        <ul className="px-6 pb-4 flex-grow">
             {products.map((product, index) => (
-            <li key={index} className="flex justify-between items-center py-3 px-3 rounded-lg hover:bg-gray-50/70">
-                <span className="text-gray-700 font-medium">{product}</span>
+            <li key={index} className="flex justify-between items-center py-4 border-b border-gray-100 last:border-b-0">
+                <div className="flex items-center">
+                    <span className={`font-bold text-lg w-6 mr-3 ${currentColors.text}`}>{index + 1}.</span>
+                    <span className="text-gray-800 font-semibold text-base">{product}</span>
+                </div>
                 <button
-                onClick={() => handleFindPrice(product)}
-                className="text-sm bg-gray-100 text-gray-700 font-semibold px-3 py-1.5 rounded-md hover:bg-gray-200 transition-colors flex-shrink-0"
+                    onClick={() => handleFindPrice(product)}
+                    className={`text-sm font-semibold px-3 py-1.5 rounded-md transition-colors flex-shrink-0 ${currentColors.buttonBg} ${currentColors.buttonText}`}
                 >
                 Знайти ціну
                 </button>
