@@ -14,6 +14,7 @@ export enum ProblemType {
   Weeds = 'weeds',
   Diseases = 'diseases',
   Pests = 'pests',
+  Integrated = 'integrated',
 }
 
 export interface Herbicide {
@@ -34,6 +35,7 @@ export interface Herbicide {
 export interface Fungicide {
   activeIngredient: string;
   productName: string;
+  category: 1 | 2 | 3;
   controls: {
     bacteriosis: boolean;
     phytophthora: boolean;
@@ -45,6 +47,7 @@ export interface Fungicide {
 export interface Insecticide {
     activeIngredient: string;
     productName: string;
+    category: 1 | 2 | 3;
     controls: {
         aphids: boolean;
         thrips: boolean;

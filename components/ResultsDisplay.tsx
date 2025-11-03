@@ -5,13 +5,15 @@ import { cropData } from '../data';
 import HerbicideCard from './HerbicideCard';
 import FungicideCard from './FungicideCard';
 import InsecticideCard from './InsecticideCard';
+import IntegratedSystemTable from './IntegratedSystemTable';
 
 interface ResultsDisplayProps {
   problemType: ProblemType;
   cropType: CropType;
+  integratedSystemPlan?: any[] | null;
 }
 
-const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ problemType, cropType }) => {
+const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ problemType, cropType, integratedSystemPlan }) => {
   let content;
   let title;
   const data = cropData[cropType];
@@ -41,6 +43,14 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ problemType, cropType }
         <div className="space-y-4">
           {data.insecticides.map((i, index) => <InsecticideCard key={index} insecticide={i} />)}
         </div>
+      );
+      break;
+    case ProblemType.Integrated:
+      title = "Згенерована система захисту";
+      content = integratedSystemPlan ? (
+          <IntegratedSystemTable plan={integratedSystemPlan} />
+      ) : (
+          <p className="text-center text-gray-500 py-4">План не згенеровано. Спробуйте ще раз.</p>
       );
       break;
     default:
