@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ProblemType, CropType, Fungicide, Insecticide } from './types';
+import { ProblemType, CropType, Fungicide, Insecticide, PlotType } from './types';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import CropSelector from './components/CropSelector';
@@ -7,6 +7,7 @@ import ProblemSelector from './components/ProblemSelector';
 import ResultsDisplay from './components/ResultsDisplay';
 import Stepper from './components/Stepper';
 import LandingPage from './components/LandingPage';
+import PlotTypeSelector from './components/PlotTypeSelector';
 import IntegratedSystemModal from './components/IntegratedSystemModal';
 import { cropData } from './data';
 
@@ -18,10 +19,11 @@ const topProducts = {
 };
 
 const App: React.FC = () => {
-  const [view, setView] = useState<'landing' | 'builder'>('landing');
+  const [view, setView] = useState<'landing' | 'plotTypeSelection' | 'builder'>('landing');
   const [currentStep, setCurrentStep] = useState(1);
   const [selectedCrop, setSelectedCrop] = useState<CropType | null>(null);
   const [selectedProblem, setSelectedProblem] = useState<ProblemType | null>(null);
+  const [plotType, setPlotType] = useState<PlotType | null>(null);
   const [isIntegratedModalOpen, setIsIntegratedModalOpen] = useState(false);
   const [integratedSystemPlan, setIntegratedSystemPlan] = useState<any[] | null>(null);
 
@@ -41,6 +43,11 @@ const App: React.FC = () => {
     }
   };
 
+  const handleSelectPlotType = (type: PlotType) => {
+    setPlotType(type);
+    setView('builder');
+  }
+
   const goToStep = (step: number) => {
     if (step < currentStep) {
       if (step === 1) {
@@ -58,7 +65,14 @@ const App: React.FC = () => {
     setSelectedCrop(null);
     setSelectedProblem(null);
     setIntegratedSystemPlan(null);
+    setPlotType(null);
+    setView('plotTypeSelection');
   };
+  
+  const startBuilder = () => {
+    resetBuilder();
+    setView('plotTypeSelection');
+  }
 
   const goToLanding = () => {
       setView('landing');
@@ -66,13 +80,16 @@ const App: React.FC = () => {
   }
   
   const generatePlan = (crop: CropType, period: number) => {
+    if (!plotType) return [];
+    
     const numTreatments = Math.round((period - 20) / 7);
     if (numTreatments <= 0) return [];
 
-    const availableFungicides = [...cropData[crop].fungicides];
-    const availableInsecticides = [...cropData[crop].insecticides].filter(
+    const availableFungicides = [...cropData[crop].fungicides].filter(p => plotType === 'home' ? p.rateHome !== null : p.rateField !== null);
+    const availableInsecticides = [...cropData[crop].insecticides].filter(p => plotType === 'home' ? p.rateHome !== null : p.rateField !== null).filter(
         p => p.productName !== 'Регент' && p.productName !== 'Форс'
     );
+
     const allProducts: Product[] = [...availableFungicides, ...availableInsecticides];
 
     const usageCount = new Map<string, number>();
@@ -318,18 +335,6 @@ const App: React.FC = () => {
     [CropType.Celery]: 'селери',
   };
 
-  const cropNameMapNominative = {
-    [CropType.Tomato]: 'Томат',
-    [CropType.Pepper]: 'Перець',
-    [CropType.Cabbage]: 'Капуста',
-    [CropType.Onion]: 'Цибуля',
-    [CropType.Carrot]: 'Морква',
-    [CropType.Pumpkin]: 'Гарбузові',
-    [CropType.Eggplant]: 'Баклажан',
-    [CropType.Beet]: 'Буряк',
-    [CropType.Celery]: 'Селера',
-  }
-
   const problemNameMap = {
     [ProblemType.Weeds]: "Бур'яни",
     [ProblemType.Diseases]: "Хвороби",
@@ -356,7 +361,7 @@ const App: React.FC = () => {
         return (
           <>
             <h2 className="text-2xl md:text-3xl font-bold text-gray-800 mb-6">Крок 2: Оберіть проблему для {selectedCrop && cropNameMap[selectedCrop]}</h2>
-            {selectedCrop && <ProblemSelector selectedCrop={selectedCrop} selectedProblem={selectedProblem} onSelectProblem={handleSelectProblem} />}
+            {selectedCrop && plotType && <ProblemSelector selectedCrop={selectedCrop} plotType={plotType} selectedProblem={selectedProblem} onSelectProblem={handleSelectProblem} />}
           </>
         );
       case 3:
@@ -364,7 +369,7 @@ const App: React.FC = () => {
           <>
             <h2 className="text-2xl md:text-3xl font-bold text-gray-800 mb-2">Результати</h2>
             {selectedCrop && selectedProblem && <p className="text-gray-600 mb-6">Рекомендації для <strong>{selectedCrop && cropNameMap[selectedCrop]}</strong> по проблемі: <strong>{problemNameMap[selectedProblem]}</strong></p>}
-            {selectedProblem && selectedCrop && <ResultsDisplay problemType={selectedProblem} cropType={selectedCrop} integratedSystemPlan={integratedSystemPlan} />}
+            {selectedProblem && selectedCrop && plotType && <ResultsDisplay problemType={selectedProblem} cropType={selectedCrop} plotType={plotType} integratedSystemPlan={integratedSystemPlan} />}
             <button
               onClick={resetBuilder}
               className="mt-8 bg-green-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-green-700 transition-colors shadow-lg"
@@ -381,7 +386,7 @@ const App: React.FC = () => {
   if (view === 'landing') {
       return (
           <div className="min-h-screen flex flex-col">
-              <Header onHomeClick={goToLanding} onStartBuilder={() => setView('builder')} />
+              <Header onHomeClick={goToLanding} onStartBuilder={startBuilder} />
               <main className="flex-grow">
                   <LandingPage />
               </main>
@@ -389,10 +394,22 @@ const App: React.FC = () => {
           </div>
       );
   }
+  
+  if (view === 'plotTypeSelection') {
+      return (
+        <div className="min-h-screen flex flex-col">
+          <Header onHomeClick={goToLanding} onStartBuilder={startBuilder} />
+           <main className="flex-grow container mx-auto px-4 py-8">
+              <PlotTypeSelector onSelectPlotType={handleSelectPlotType} />
+           </main>
+          <Footer />
+        </div>
+      );
+  }
 
   return (
     <div className="min-h-screen flex flex-col">
-      <Header onHomeClick={goToLanding} onStartBuilder={() => setView('builder')} />
+      <Header onHomeClick={goToLanding} onStartBuilder={startBuilder} />
       <main className="flex-grow container mx-auto px-4 py-8">
         <Stepper steps={steps} currentStep={currentStep} goToStep={goToStep} />
         <div className="bg-white p-6 sm:p-8 rounded-xl shadow-lg animate-fade-in">

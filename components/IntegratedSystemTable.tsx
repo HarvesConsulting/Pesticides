@@ -1,5 +1,5 @@
 import React from 'react';
-import { Fungicide, Insecticide } from '../types';
+import { Fungicide, Insecticide, PlotType } from '../types';
 
 interface Plan {
     treatmentNumber: number;
@@ -9,6 +9,7 @@ interface Plan {
 
 interface IntegratedSystemTableProps {
   plan: Plan[];
+  plotType: PlotType;
 }
 
 const targetNameMap: Record<string, string> = {
@@ -20,7 +21,7 @@ const targetNameMap: Record<string, string> = {
     sucking: 'Сисні',
 };
 
-const IntegratedSystemTable: React.FC<IntegratedSystemTableProps> = ({ plan }) => {
+const IntegratedSystemTable: React.FC<IntegratedSystemTableProps> = ({ plan, plotType }) => {
     if (!plan || plan.length === 0) {
         return <p className="text-center text-gray-500 py-4">Не вдалося згенерувати план. Можливо, замалий вегетаційний період або недостатньо даних по препаратах.</p>
     }
@@ -57,7 +58,20 @@ const IntegratedSystemTable: React.FC<IntegratedSystemTableProps> = ({ plan }) =
                                     <span className="text-gray-500">Немає рекомендацій</span>
                                 )}
                             </td>
-                            <td className="px-4 py-4 align-top whitespace-nowrap text-sm text-gray-600">Див. інструкцію</td>
+                            <td className="px-4 py-4 align-top whitespace-nowrap text-sm text-gray-700 font-semibold">
+                                {treatment.products.length > 0 ? (
+                                    <ul className="space-y-2">
+                                        {treatment.products.map(p => {
+                                            const rate = plotType === 'home' ? p.rateHome : p.rateField;
+                                            return (
+                                                <li key={`${p.productName}-rate`}>
+                                                    {rate || 'Див. інструкцію'}
+                                                </li>
+                                            )
+                                        })}
+                                    </ul>
+                                ) : '-'}
+                            </td>
                             <td className="px-4 py-4 align-top">
                                 <div className="flex flex-wrap gap-2 max-w-xs">
                                     {coveredTargets.map(target => (

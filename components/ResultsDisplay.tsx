@@ -1,6 +1,5 @@
-
 import React from 'react';
-import { ProblemType, CropType } from '../types';
+import { ProblemType, CropType, PlotType } from '../types';
 import { cropData } from '../data';
 import HerbicideCard from './HerbicideCard';
 import FungicideCard from './FungicideCard';
@@ -10,13 +9,17 @@ import IntegratedSystemTable from './IntegratedSystemTable';
 interface ResultsDisplayProps {
   problemType: ProblemType;
   cropType: CropType;
+  plotType: PlotType;
   integratedSystemPlan?: any[] | null;
 }
 
-const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ problemType, cropType, integratedSystemPlan }) => {
+const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ problemType, cropType, plotType, integratedSystemPlan }) => {
   let content;
   let title;
   const data = cropData[cropType];
+
+  const fungicides = data.fungicides.filter(f => plotType === 'home' ? f.rateHome : f.rateField);
+  const insecticides = data.insecticides.filter(i => plotType === 'home' ? i.rateHome : i.rateField);
 
   switch (problemType) {
     case ProblemType.Weeds:
@@ -33,7 +36,7 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ problemType, cropType, 
       title = "Рекомендовані Фунгіциди";
       content = (
         <div className="space-y-4">
-          {data.fungicides.map((f, index) => <FungicideCard key={index} fungicide={f} />)}
+          {fungicides.map((f, index) => <FungicideCard key={index} fungicide={f} plotType={plotType} />)}
         </div>
       );
       break;
@@ -41,7 +44,7 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ problemType, cropType, 
       title = "Рекомендовані Інсектициди";
       content = (
         <div className="space-y-4">
-          {data.insecticides.map((i, index) => <InsecticideCard key={index} insecticide={i} />)}
+          {insecticides.map((i, index) => <InsecticideCard key={index} insecticide={i} plotType={plotType} />)}
         </div>
       );
       break;
@@ -52,7 +55,7 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ problemType, cropType, 
           <p className="text-center text-gray-600 mb-4 text-sm">
             <strong>Примітка:</strong> інтервал між обробками в середньому 7–10 днів.
           </p>
-          <IntegratedSystemTable plan={integratedSystemPlan} />
+          <IntegratedSystemTable plan={integratedSystemPlan} plotType={plotType} />
         </>
       ) : (
           <p className="text-center text-gray-500 py-4">План не згенеровано. Спробуйте ще раз.</p>

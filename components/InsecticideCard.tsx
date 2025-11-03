@@ -1,9 +1,9 @@
-
 import React from 'react';
-import { Insecticide } from '../types';
+import { Insecticide, PlotType } from '../types';
 
 interface InsecticideCardProps {
   insecticide: Insecticide;
+  plotType: PlotType;
 }
 
 const CheckIcon = () => (
@@ -19,7 +19,7 @@ const XIcon = () => (
 );
 
 
-const InsecticideCard: React.FC<InsecticideCardProps> = ({ insecticide }) => {
+const InsecticideCard: React.FC<InsecticideCardProps> = ({ insecticide, plotType }) => {
   const controls = [
     { label: 'Тлі', controlled: insecticide.controls.aphids },
     { label: 'Трипси', controlled: insecticide.controls.thrips },
@@ -29,12 +29,19 @@ const InsecticideCard: React.FC<InsecticideCardProps> = ({ insecticide }) => {
     { label: 'Твердокрилі', controlled: insecticide.controls.coleoptera },
   ];
 
+  const rate = plotType === 'home' ? insecticide.rateHome : insecticide.rateField;
+
   return (
     <div className="bg-white rounded-lg shadow-md border border-gray-200 p-4 sm:p-6">
       <div className="flex flex-col sm:flex-row justify-between sm:items-start">
         <div>
           <h4 className="text-xl font-bold text-red-800">{insecticide.productName}</h4>
-          <p className="text-md text-gray-600">{insecticide.activeIngredient}</p>
+          <p className="text-md text-gray-600 mb-2">{insecticide.activeIngredient}</p>
+          {rate && (
+            <p className="text-sm font-semibold text-gray-800 bg-green-50 px-3 py-1.5 rounded-md inline-block">
+                Норма: <span className="text-green-700 font-bold">{rate}</span>
+            </p>
+          )}
         </div>
         <div className="mt-4 sm:mt-0 sm:ml-6 grid grid-cols-2 gap-x-6 gap-y-2 text-sm">
           {controls.map(control => (

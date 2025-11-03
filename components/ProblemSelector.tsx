@@ -1,6 +1,5 @@
-
 import React from 'react';
-import { ProblemType, CropType } from '../types';
+import { ProblemType, CropType, PlotType } from '../types';
 import { WeedIcon } from './icons/WeedIcon';
 import { DiseaseIcon } from './icons/DiseaseIcon';
 import { PestIcon } from './icons/PestIcon';
@@ -9,20 +8,23 @@ import { cropData } from '../data';
 
 interface ProblemSelectorProps {
   selectedCrop: CropType;
+  plotType: PlotType;
   selectedProblem: ProblemType | null;
   onSelectProblem: (problem: ProblemType) => void;
 }
 
-const ProblemSelector: React.FC<ProblemSelectorProps> = ({ selectedCrop, selectedProblem, onSelectProblem }) => {
+const ProblemSelector: React.FC<ProblemSelectorProps> = ({ selectedCrop, plotType, selectedProblem, onSelectProblem }) => {
   const hasHerbicides = cropData[selectedCrop].herbicides.length > 0;
-  const hasFungicides = cropData[selectedCrop].fungicides.length > 0;
-  const hasInsecticides = cropData[selectedCrop].insecticides.length > 0;
+  const hasFungicides = cropData[selectedCrop].fungicides.some(f => plotType === 'home' ? f.rateHome !== null : f.rateField !== null);
+  const hasInsecticides = cropData[selectedCrop].insecticides.some(i => plotType === 'home' ? i.rateHome !== null : i.rateField !== null);
 
   const options = [
     { type: ProblemType.Weeds, label: 'Бур\'яни', icon: <WeedIcon />, disabled: !hasHerbicides },
     { type: ProblemType.Diseases, label: 'Хвороби', icon: <DiseaseIcon />, disabled: !hasFungicides },
     { type: ProblemType.Pests, label: 'Шкідники', icon: <PestIcon />, disabled: !hasInsecticides },
   ];
+
+  const isIntegratedDisabled = !hasFungicides && !hasInsecticides;
 
   return (
     <>
@@ -50,7 +52,12 @@ const ProblemSelector: React.FC<ProblemSelectorProps> = ({ selectedCrop, selecte
       <div className="mt-8 border-t pt-8">
         <button
             onClick={() => onSelectProblem(ProblemType.Integrated)}
-            className="w-full p-6 rounded-lg shadow-lg border-2 transition-all duration-300 ease-in-out transform flex flex-col sm:flex-row items-center text-center sm:text-left bg-white text-gray-700 border-transparent hover:-translate-y-1 hover:border-green-500 hover:shadow-xl"
+            disabled={isIntegratedDisabled}
+            className={`w-full p-6 rounded-lg shadow-lg border-2 transition-all duration-300 ease-in-out transform flex flex-col sm:flex-row items-center text-center sm:text-left
+              ${isIntegratedDisabled 
+                ? 'opacity-50 cursor-not-allowed bg-gray-100' 
+                : 'bg-white text-gray-700 border-transparent hover:-translate-y-1 hover:border-green-500 hover:shadow-xl'
+              }`}
         >
             <div className="w-16 h-16 mb-4 sm:mb-0 sm:mr-6 text-green-600 flex-shrink-0"><IntegratedIcon /></div>
             <div>

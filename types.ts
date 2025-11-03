@@ -17,6 +17,8 @@ export enum ProblemType {
   Integrated = 'integrated',
 }
 
+export type PlotType = 'home' | 'field';
+
 export interface Herbicide {
   activeIngredient: string;
   productName: string;
@@ -42,6 +44,8 @@ export interface Fungicide {
     rots: boolean;
     rootRots: boolean;
   };
+  rateHome: string | null;
+  rateField: string | null;
 }
 
 export interface Insecticide {
@@ -55,6 +59,8 @@ export interface Insecticide {
         lepidoptera: boolean; // лускокрилі
         coleoptera: boolean; // твердокрилі
     };
+    rateHome: string | null;
+    rateField: string | null;
 }
 
 export interface CropProtectionData {
