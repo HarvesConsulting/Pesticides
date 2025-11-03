@@ -775,8 +775,8 @@ const carrotInsecticides: Insecticide[] = [
     { activeIngredient: 'лямбда-цигалотрин', productName: 'Карате Зеон', category: 2, controls: { aphids: true, thrips: true, whiteflies: false, mites: false, lepidoptera: true, coleoptera: true } },
     { activeIngredient: 'ацетаміприд', productName: 'Моспілан', category: 2, controls: { aphids: true, thrips: true, whiteflies: true, mites: false, lepidoptera: false, coleoptera: true } },
     { activeIngredient: 'спіротетрамат', productName: 'Мовенто', category: 2, controls: { aphids: true, thrips: true, whiteflies: true, mites: true, lepidoptera: false, coleoptera: false } },
-    { activeIngredient: 'хлорантраніліпрол', productName: 'Кораген', category: 2, controls: { aphids: false, thrips: false, whiteflies: false, mites: false, lepidoptera: true, coleoptera: true } },
-    { activeIngredient: 'Емамектину бензоат', productName: 'Проклейм', category: 2, controls: { aphids: false, thrips: true, whiteflies: false, mites: false, lepidoptera: true, coleoptera: false } },
+    { activeIngredient: 'флупірадифурон', productName: 'Сіванто Прайм', category: 2, controls: { aphids: true, thrips: true, whiteflies: true, mites: false, lepidoptera: false, coleoptera: false } },
+    { activeIngredient: 'флонікамід', productName: 'Теппекі', category: 2, controls: { aphids: true, thrips: true, whiteflies: false, mites: false, lepidoptera: false, coleoptera: false } },
 ];
 
 const pumpkinFungicides: Fungicide[] = [
@@ -1088,7 +1088,7 @@ const beetInsecticides: Insecticide[] = [
     { activeIngredient: 'імідаклоприд', productName: 'Конфідор', category: 2, controls: { aphids: true, thrips: false, whiteflies: false, mites: false, lepidoptera: false, coleoptera: true } },
     { activeIngredient: 'лямбда-цигалотрин', productName: 'Карате Зеон', category: 2, controls: { aphids: true, thrips: false, whiteflies: false, mites: false, lepidoptera: true, coleoptera: true } },
     { activeIngredient: 'ацетаміприд', productName: 'Моспілан', category: 2, controls: { aphids: true, thrips: false, whiteflies: false, mites: false, lepidoptera: false, coleoptera: true } },
-    { activeIngredient: 'хлорантраніліпрол', productName: 'Кораген', category: 2, controls: { aphids: false, thrips: false, whiteflies: false, mites: false, lepidoptera: true, coleoptera: true } },
+    { activeIngredient: 'флонікамід', productName: 'Теппекі', category: 2, controls: { aphids: true, thrips: true, whiteflies: false, mites: false, lepidoptera: false, coleoptera: false } },
     { activeIngredient: 'дельтаметрин', productName: 'Децис', category: 2, controls: { aphids: true, thrips: false, whiteflies: false, mites: false, lepidoptera: true, coleoptera: true } },
 ];
 
@@ -1183,7 +1183,7 @@ const celeryHerbicides: Herbicide[] = [
         applicationTime: 'після',
         registrationUA: '-',
         registrationWorld: '+',
-        description: 'Це селективний гербіцид з грунтовою та контактною дією. Механізм дії полягає у блокуванні реакції Хілла та гальмуванні процесу фотосинтезу. Знищення бур\'янів відбувається в момент їхнього проростання при довсходовому або протягом 4-7 днів при післявсходовому застосуванні.',
+        description: 'Це селективний гербіцид з грунтовою та контактною дією. Механізм дії полягає у блокуванні реакції Хілла та гальмуванні процесу фотосинтезу. Знищення бур\'янів відбувається в момент їхнього проростання при довсходовом або протягом 4-7 днів при післявсходовому застосуванні.',
         spectrum: {
             sensitive: ['буркун лікарський', 'вероніка персидська', 'галінсога дрібноквіткова', 'геліотроп', 'герань розсічена', 'гірчак почечуйний', 'гірчиця (види)', 'грицики звичайні', 'дворядник', 'зірочник середній', 'королиця посівна', 'кропива жалка', 'курячі очки', 'лобода (вида)', 'нетреба звичайна', 'осот городній', 'паслін чорний', 'портулак', 'роман польовий', 'ромашка (види)', 'череда', 'щириця (види)', 'канареєчник канарський', 'пальчатка криваво-червона', 'просо (види)', 'тонконіг (види)'],
             moderatelySensitive: [],
@@ -1216,7 +1216,7 @@ const celeryInsecticides: Insecticide[] = [
     { activeIngredient: 'тіаметоксам', productName: 'Актара', category: 2, controls: { aphids: true, thrips: false, whiteflies: false, mites: false, lepidoptera: false, coleoptera: true } },
     { activeIngredient: 'лямбда-цигалотрин', productName: 'Карате Зеон', category: 2, controls: { aphids: true, thrips: true, whiteflies: false, mites: false, lepidoptera: true, coleoptera: true } },
     { activeIngredient: 'абамектин', productName: 'Вертімек', category: 2, controls: { aphids: false, thrips: true, whiteflies: false, mites: true, lepidoptera: false, coleoptera: false } },
-    { activeIngredient: 'хлорантраніліпрол', productName: 'Кораген', category: 2, controls: { aphids: false, thrips: false, whiteflies: false, mites: false, lepidoptera: true, coleoptera: true } },
+    { activeIngredient: 'флупірадифурон', productName: 'Сіванто Прайм', category: 2, controls: { aphids: true, thrips: true, whiteflies: true, mites: false, lepidoptera: false, coleoptera: false } },
     { activeIngredient: 'спіротетрамат', productName: 'Мовенто', category: 2, controls: { aphids: true, thrips: true, whiteflies: true, mites: true, lepidoptera: false, coleoptera: false } },
     { activeIngredient: 'ацетаміприд', productName: 'Моспілан', category: 2, controls: { aphids: true, thrips: true, whiteflies: false, mites: false, lepidoptera: false, coleoptera: true } },
 ];

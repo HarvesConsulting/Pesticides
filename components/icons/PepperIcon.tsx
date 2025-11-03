@@ -1,12 +1,15 @@
-
 import React from 'react';
 
 export const PepperIcon: React.FC = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" className="w-full h-full" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" fill="none" strokeLinecap="round" strokeLinejoin="round">
-        <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-        <path d="M13.898 14.5c-.328 .328 -.696 .618 -1.102 .872c-1.423 .893 -3.07 .213 -3.796 -1.228c-.727 -1.442 -.047 -3.088 1.228 -3.796c.096 -.053 .193 -.103 .293 -.148" />
-        <path d="M12.488 11.238c.19 -.43 .44 -.832 .752 -1.198c1.442 -1.692 3.86 -1.89 5.552 -.448s1.89 3.86 .448 5.552c-.083 .098 -.17 .192 -.26 .282" />
-        <path d="M12.5 11.5l-3.847 -3.847c-1.636 -1.636 -4.29 -1.636 -5.927 0c-1.636 1.636 -1.636 4.29 0 5.927l3.847 3.847" />
-        <path d="M8.223 8.223c.913 -1.223 2.443 -1.67 3.967 -1.32" />
+    <svg xmlns="http://www.w3.org/2000/svg" className="w-full h-full" viewBox="0 0 24 24">
+        <defs>
+            <linearGradient id="pepperGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" style={{stopColor: '#FF4136'}} />
+                <stop offset="100%" style={{stopColor: '#8B0000'}} />
+            </linearGradient>
+        </defs>
+        <path fill="#006400" d="M12 2a2 2 0 0 1 2 2h-4a2 2 0 0 1 2-2z M10 4h4v2h-4z"/>
+        <path fill="url(#pepperGradient)" stroke="#8B0000" strokeWidth="0.5" d="M18,9 C18,13 16,21 12,21 C8,21 6,13 6,9 C6,6 8,6 12,6 C16,6 18,6 18,9 Z M12,21 C10,16 10,9 10,9 M12,21 C14,16 14,9 14,9"/>
+        <path d="M16,9 C16,11 15,12 14.5,13" fill="none" stroke="rgba(255,255,255,0.3)" strokeWidth="1.5"/>
     </svg>
 );

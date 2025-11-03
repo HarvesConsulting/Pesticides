@@ -1,12 +1,17 @@
 import React from 'react';
 
 export const WatermelonIcon: React.FC = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" className="w-full h-full" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" fill="none" strokeLinecap="round" strokeLinejoin="round">
-        <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-        <path d="M11.233 15.686c-2.002 .303 -3.903 .223 -5.713 -.236c-2.368 -.6 -3.52 -2.87 -2.92 -5.238s2.87 -3.52 5.238 -2.92s3.52 2.87 2.92 5.238" />
-        <path d="M12.767 8.314c2.002 -.303 3.903 -.223 5.713 .236c2.368 .6 3.52 2.87 2.92 5.238s-2.87 3.52 -5.238 2.92s-3.52 -2.87 -2.92 -5.238" />
-        <path d="M12 2v2" />
-        <path d="M12 8.5c-2.485 0 -4.5 2.015 -4.5 4.5s2.015 4.5 4.5 4.5s4.5 -2.015 4.5 -4.5" />
-        <path d="M12 13c-1.657 0 -3 -1.343 -3 -3" />
+    <svg xmlns="http://www.w3.org/2000/svg" className="w-full h-full" viewBox="0 0 24 24">
+        <defs>
+            <radialGradient id="pumpkinGradient" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
+                <stop offset="0%" style={{stopColor: '#FFD700'}} />
+                <stop offset="100%" style={{stopColor: '#FFA500'}} />
+            </radialGradient>
+        </defs>
+        <path fill="#8B4513" d="M12,2 C10,2 10,4 12,4 C14,4 14,2 12,2 Z M10,4 C9,4 9,5 10,5 L10,4Z M14,4 C15,4 15,5 14,5 L14,4Z"/>
+        <ellipse cx="12" cy="14" rx="9" ry="7" fill="url(#pumpkinGradient)" stroke="#D2691E" strokeWidth="0.5" />
+        <path d="M12,5 V21" stroke="#E67E22" strokeWidth="1.5" strokeLinecap="round"/>
+        <path d="M6,10 C8,5 16,5 18,10" fill="none" stroke="#E67E22" strokeWidth="1.5" strokeLinecap="round"/>
+        <path d="M6,18 C8,23 16,23 18,18" fill="none" stroke="#E67E22" strokeWidth="1.5" strokeLinecap="round"/>
     </svg>
 );

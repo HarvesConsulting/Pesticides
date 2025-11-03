@@ -1,11 +1,17 @@
 import React from 'react';
 
 export const CarrotIcon: React.FC = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" className="w-full h-full" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" fill="none" strokeLinecap="round" strokeLinejoin="round">
-      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-      <path d="M10.233 13.785l-4.233 4.215l-3 -3l4.215 -4.233a1.92 1.92 0 0 1 2.653 -.055l.084 .055l.48 .48a1.92 1.92 0 0 1 .055 2.653l-.055 .084l-.48 .48z" />
-      <path d="M19 6.5s-2.5 -1.5 -5 -1.5s-5 1.5 -5 1.5s2.5 1.5 5 1.5s5 -1.5 5 -1.5" />
-      <path d="M18 8.5s-1.5 1.5 -3 1.5" />
-      <path d="M9.816 11.309l1.434 1.434a1.92 1.92 0 0 0 2.653 -.055l.084 -.055l3.48 -3.48a1.92 1.92 0 0 0 -2.714 -2.714l-3.48 3.48a1.92 1.92 0 0 0 .055 2.653l.055 -.084l-.234 .234" />
+    <svg xmlns="http://www.w3.org/2000/svg" className="w-full h-full" viewBox="0 0 24 24">
+        <defs>
+            <linearGradient id="carrotGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" style={{stopColor: '#FFA500'}} />
+                <stop offset="100%" style={{stopColor: '#FF8C00'}} />
+            </linearGradient>
+        </defs>
+        <path fill="#228B22" d="M12,2 L11,5 L10,3 L9,5 L8,3 L7,5 L8,6 L9,5 L10,6 L11,5 L12,6 L13,5 L14,6 L15,5 L16,6 L17,5 L16,3 L15,5 L14,3 L13,5 L12,2 Z"/>
+        <path fill="url(#carrotGradient)" stroke="#E65100" strokeWidth="0.5" d="M12,6 C12,6 15,12 12,22 C12,22 9,12 12,6 Z"/>
+        <path d="M12,9 L13,11" fill="none" stroke="#FFD700" strokeWidth="0.5"/>
+        <path d="M12,12 L11,14" fill="none" stroke="#FFD700" strokeWidth="0.5"/>
+        <path d="M12,15 L13,17" fill="none" stroke="#FFD700" strokeWidth="0.5"/>
     </svg>
 );

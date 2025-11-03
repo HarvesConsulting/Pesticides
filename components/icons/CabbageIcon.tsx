@@ -1,13 +1,17 @@
 import React from 'react';
 
 export const CabbageIcon: React.FC = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" className="w-full h-full" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" fill="none" strokeLinecap="round" strokeLinejoin="round">
-        <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-        <path d="M12 2a8.956 8.956 0 0 0 -8.825 6.023a1 1 0 0 0 .825 1.25a8.956 8.956 0 0 1 8 -7.273a1 1 0 0 0 0 -2z" />
-        <path d="M12 2a8.956 8.956 0 0 1 8.825 6.023a1 1 0 0 1 -.825 1.25a8.956 8.956 0 0 0 -8 -7.273a1 1 0 0 1 0 -2z" />
-        <path d="M12 11.25c-4.852 0 -8.825 -2.697 -8.825 -6.023" />
-        <path d="M20.825 5.227c0 3.326 -3.973 6.023 -8.825 6.023" />
-        <path d="M12 22c4.852 0 8.825 -4.03 8.825 -9c0 -4.97 -3.973 -9 -8.825 -9" />
-        <path d="M12 22c-4.852 0 -8.825 -4.03 -8.825 -9c0 -4.97 3.973 -9 8.825 -9" />
+    <svg xmlns="http://www.w3.org/2000/svg" className="w-full h-full" viewBox="0 0 24 24">
+        <defs>
+            <radialGradient id="cabbageGradient" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
+                <stop offset="0%" style={{stopColor: '#98FB98'}} />
+                <stop offset="100%" style={{stopColor: '#2E8B57'}} />
+            </radialGradient>
+        </defs>
+        <circle cx="12" cy="14" r="8" fill="url(#cabbageGradient)" stroke="#006400" strokeWidth="0.5"/>
+        <path d="M5,16 C3,14 4,8 8,7" fill="none" stroke="#556B2F" strokeWidth="1.5" strokeLinecap="round"/>
+        <path d="M19,16 C21,14 20,8 16,7" fill="none" stroke="#556B2F" strokeWidth="1.5" strokeLinecap="round"/>
+        <path d="M8,19 C6,18 4,14 6,11" fill="none" stroke="#6B8E23" strokeWidth="1.5" strokeLinecap="round"/>
+        <path d="M16,19 C18,18 20,14 18,11" fill="none" stroke="#6B8E23" strokeWidth="1.5" strokeLinecap="round"/>
     </svg>
 );

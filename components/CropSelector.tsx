@@ -40,7 +40,7 @@ const CropSelector: React.FC<CropSelectorProps> = ({ selectedCrop, onSelectCrop 
               : 'bg-white text-gray-700 border-transparent hover:border-green-500'
             }`}
         >
-          <div className="w-16 h-16 mb-4 text-gray-800">{option.icon}</div>
+          <div className="w-16 h-16 mb-4">{option.icon}</div>
           <span className="text-2xl font-semibold">{option.label}</span>
         </button>
       ))}

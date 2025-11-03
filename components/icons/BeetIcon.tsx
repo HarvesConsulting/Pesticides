@@ -1,12 +1,15 @@
 import React from 'react';
 
 export const BeetIcon: React.FC = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" className="w-full h-full" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" fill="none" strokeLinecap="round" strokeLinejoin="round">
-        <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-        <path d="M13.847 16.32c-1.399 .762 -3.423 .44 -4.823 -1.055s-1.802 -3.61 -1.055 -4.823c.747 -1.213 2.37 -1.975 4.068 -1.975c2.5 0 4.5 2.015 4.5 4.5c0 1.352 -.69 2.553 -1.737 3.353" />
-        <path d="M14 3v3" />
-        <path d="M11 5v3" />
-        <path d="M17 5v3" />
-        <path d="M12.484 15.025l-1.484 2.975" />
+    <svg xmlns="http://www.w3.org/2000/svg" className="w-full h-full" viewBox="0 0 24 24">
+        <defs>
+            <radialGradient id="beetGradient" cx="50%" cy="50%" r="50%" fx="30%" fy="30%">
+                <stop offset="0%" style={{stopColor: '#C71585'}} />
+                <stop offset="100%" style={{stopColor: '#8B008B'}} />
+            </radialGradient>
+        </defs>
+        <path fill="#006400" d="M12,2 L11,6 L13,6 Z M10,3 L9,7 L11,6 Z M14,3 L15,7 L13,6 Z"/>
+        <circle cx="12" cy="15" r="6" fill="url(#beetGradient)" stroke="#4B0082" strokeWidth="0.5"/>
+        <path d="M12,21 L12,23" fill="none" stroke="#8B4513" strokeWidth="1.5" strokeLinecap="round"/>
     </svg>
 );

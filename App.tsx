@@ -12,6 +12,11 @@ import { cropData } from './data';
 
 type Product = Fungicide | Insecticide;
 
+const topProducts = {
+  fungicides: new Set(['Зорвек Інкантія', 'Ридоміл Голд Р', 'Сігнум', 'Квадріс', 'Медян Екстра']),
+  insecticides: new Set(['Белт', 'Радіант', 'Проклейм', 'Мовенто']), // Верімарк is excluded as it's for soil application
+};
+
 const App: React.FC = () => {
   const [view, setView] = useState<'landing' | 'builder'>('landing');
   const [currentStep, setCurrentStep] = useState(1);
@@ -81,7 +86,24 @@ const App: React.FC = () => {
     const isFungicide = (p: Product): p is Fungicide => 'bacteriosis' in p.controls;
     const isInsecticide = (p: Product): p is Insecticide => 'aphids' in p.controls;
 
-    // Phase 1: Treatments 1-3 (Flexible greedy approach)
+    const hasTargetOverlap = (p1: Product, p2: Product): boolean => {
+        if (isFungicide(p1) && isFungicide(p2)) {
+            return (p1.controls.bacteriosis && p2.controls.bacteriosis) ||
+                   (p1.controls.phytophthora && p2.controls.phytophthora) ||
+                   (p1.controls.rots && p2.controls.rots);
+        }
+        if (isInsecticide(p1) && isInsecticide(p2)) {
+            const p1IsSucking = p1.controls.aphids || p1.controls.thrips || p1.controls.whiteflies || p1.controls.mites;
+            const p2IsSucking = p2.controls.aphids || p2.controls.thrips || p2.controls.whiteflies || p2.controls.mites;
+
+            return (p1.controls.lepidoptera && p2.controls.lepidoptera) ||
+                   (p1.controls.coleoptera && p2.controls.coleoptera) ||
+                   (p1IsSucking && p2IsSucking);
+        }
+        return false; // Different types (fungicide vs insecticide) can't overlap
+    };
+
+    // Phase 1: Treatments 1-3 (Flexible greedy approach, prioritize top products)
     for (let i = 0; i < Math.min(numTreatments, 3); i++) {
         const targets: { [key: string]: boolean } = {
             phytophthora: true, rots: true, bacteriosis: true,
@@ -100,19 +122,28 @@ const App: React.FC = () => {
             let bestScore = -1;
             let bestProductIndex = -1;
 
+            const existingCat2Products = treatmentProducts.filter(p => p.category === 2);
+
             productsPool.forEach((p, index) => {
                 if (treatmentProducts.length === 0 && p.category === 3) return;
+
+                // Rule: Don't add a Cat 2 if it overlaps with an existing Cat 2
+                if (p.category === 2 && existingCat2Products.some(existingP => hasTargetOverlap(p, existingP))) {
+                    return; // Skip this product
+                }
 
                 let score = 0;
                 if (isFungicide(p)) {
                     if (targets.bacteriosis && p.controls.bacteriosis) score++;
                     if (targets.phytophthora && p.controls.phytophthora) score++;
                     if (targets.rots && p.controls.rots) score++;
+                    if (topProducts.fungicides.has(p.productName)) score += 5; // Prioritize top fungicides
                 } else if (isInsecticide(p)) {
                     if (targets.lepidoptera && p.controls.lepidoptera) score++;
                     if (targets.coleoptera && p.controls.coleoptera) score++;
                     const isSucking = p.controls.aphids || p.controls.thrips || p.controls.whiteflies || p.controls.mites;
                     if (targets.sucking && isSucking) score++;
+                    if (topProducts.insecticides.has(p.productName)) score += 5; // Prioritize top insecticides
                 }
 
                 if (score > bestScore) {
@@ -154,7 +185,7 @@ const App: React.FC = () => {
         treatmentProducts.forEach(p => lastTreatmentProductKeys.add(`${p.productName}|${p.activeIngredient}`));
     }
 
-    // Phase 2: Treatments 4+ (Strict combinatorial approach)
+    // Phase 2: Treatments 4+ (Strict combinatorial approach, prioritize top products)
     for (let i = 3; i < numTreatments; i++) {
         const treatmentProducts: Product[] = [];
         const coveredTargets = new Set<string>();
@@ -194,16 +225,33 @@ const App: React.FC = () => {
             );
             
             let candidate: Product | undefined;
-            if (target === 'phytophthora') {
-                candidate = productPool.find(p => isFungicide(p) && p.controls.phytophthora);
-            } else if (target === 'rots') {
-                candidate = productPool.find(p => isFungicide(p) && p.controls.rots);
-            } else if (target === 'lepidoptera') {
-                candidate = productPool.find(p => isInsecticide(p) && p.controls.lepidoptera);
-            } else if (target === 'coleoptera') {
-                candidate = productPool.find(p => isInsecticide(p) && p.controls.coleoptera);
-            } else if (target === 'sucking') {
-                candidate = productPool.find(p => isInsecticide(p) && (p.controls.aphids || p.controls.thrips || p.controls.whiteflies || p.controls.mites));
+
+            const isTargetMatch = (p: Product): boolean => {
+                if (target === 'phytophthora') return isFungicide(p) && p.controls.phytophthora;
+                if (target === 'rots') return isFungicide(p) && p.controls.rots;
+                if (target === 'lepidoptera') return isInsecticide(p) && p.controls.lepidoptera;
+                if (target === 'coleoptera') return isInsecticide(p) && p.controls.coleoptera;
+                if (target === 'sucking') return isInsecticide(p) && (p.controls.aphids || p.controls.thrips || p.controls.whiteflies || p.controls.mites);
+                return false;
+            };
+
+            const isTopProduct = (p: Product): boolean => {
+                return (isFungicide(p) && topProducts.fungicides.has(p.productName)) ||
+                       (isInsecticide(p) && topProducts.insecticides.has(p.productName));
+            }
+
+            const checkCat2Overlap = (p: Product): boolean => {
+                if (p.category !== 2) return false;
+                const existingCat2Products = treatmentProducts.filter(tp => tp.category === 2);
+                return existingCat2Products.some(existingP => hasTargetOverlap(p, existingP));
+            };
+
+            // Prioritize top products, checking for overlap
+            candidate = productPool.find(p => isTargetMatch(p) && isTopProduct(p) && !checkCat2Overlap(p));
+
+            // If no top product found, find any matching product, checking for overlap
+            if (!candidate) {
+                candidate = productPool.find(p => isTargetMatch(p) && !checkCat2Overlap(p));
             }
             
             if (candidate) {
@@ -285,106 +333,62 @@ const App: React.FC = () => {
       case 1:
         return (
           <>
-            <h2 className="text-2xl md:text-3xl font-bold text-center text-gray-700 mb-2">
-              Крок 1: Виберіть культуру
-            </h2>
-            <p className="text-center text-gray-500 mb-8">
-              Оберіть культуру для перегляду рекомендацій по захисту.
-            </p>
+            <h2 className="text-2xl md:text-3xl font-bold text-gray-800 mb-6">Крок 1: Оберіть культуру</h2>
             <CropSelector selectedCrop={selectedCrop} onSelectCrop={handleSelectCrop} />
           </>
         );
       case 2:
-        if (!selectedCrop) return null;
         return (
           <>
-            <h2 className="text-2xl md:text-3xl font-bold text-center text-gray-700 mb-2">
-              Крок 2: Виберіть шкодочинний об'єкт для {cropNameMap[selectedCrop]}
-            </h2>
-            <p className="text-center text-gray-500 mb-8">
-              Виберіть категорію, щоб побачити рекомендовані препарати, або згенеруйте комплексну систему захисту.
-            </p>
-            <ProblemSelector
-              selectedCrop={selectedCrop}
-              selectedProblem={selectedProblem}
-              onSelectProblem={handleSelectProblem}
-            />
+            <h2 className="text-2xl md:text-3xl font-bold text-gray-800 mb-6">Крок 2: Оберіть проблему для {selectedCrop && cropNameMap[selectedCrop]}</h2>
+            {selectedCrop && <ProblemSelector selectedCrop={selectedCrop} selectedProblem={selectedProblem} onSelectProblem={handleSelectProblem} />}
           </>
         );
       case 3:
-        if (!selectedCrop || !selectedProblem) return null;
         return (
           <>
-            <div className="text-center mb-8">
-              <h2 className="text-2xl md:text-3xl font-bold text-gray-700 mb-2">
-                Крок 3: Рекомендації по захисту
-              </h2>
-              <p className="text-gray-500">
-                Рекомендації для:{' '}
-                <span className="font-semibold text-gray-800">{cropNameMapNominative[selectedCrop]}</span> /{' '}
-                <span className="font-semibold text-gray-800">{problemNameMap[selectedProblem]}</span>
-              </p>
-            </div>
-            <ResultsDisplay cropType={selectedCrop} problemType={selectedProblem} integratedSystemPlan={integratedSystemPlan} />
+            <h2 className="text-2xl md:text-3xl font-bold text-gray-800 mb-2">Результати</h2>
+            {selectedCrop && selectedProblem && <p className="text-gray-600 mb-6">Рекомендації для <strong>{selectedCrop && cropNameMap[selectedCrop]}</strong> по проблемі: <strong>{problemNameMap[selectedProblem]}</strong></p>}
+            {selectedProblem && selectedCrop && <ResultsDisplay problemType={selectedProblem} cropType={selectedCrop} integratedSystemPlan={integratedSystemPlan} />}
+            <button
+              onClick={resetBuilder}
+              className="mt-8 bg-green-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-green-700 transition-colors shadow-lg"
+            >
+              Спробувати ще раз
+            </button>
           </>
         );
       default:
         return null;
     }
   };
-  
-  const renderBuilder = () => (
-     <div className="max-w-4xl mx-auto">
-        <Stepper steps={steps} currentStep={currentStep} goToStep={goToStep} />
-        <div key={currentStep} className="mt-8 bg-white p-6 sm:p-10 rounded-xl shadow-lg animate-fade-in">
-          {renderStepContent()}
 
-          <div className="mt-10 flex justify-between items-center">
-              <button
-                  onClick={currentStep > 1 ? () => goToStep(currentStep - 1) : goToLanding}
-                  className="px-6 py-2 bg-gray-300 text-gray-700 font-semibold rounded-lg hover:bg-gray-400 transition-colors"
-              >
-                  Назад
-              </button>
-              
-              {currentStep === 3 ? (
-                   <button 
-                      onClick={resetBuilder}
-                      className="px-6 py-2 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition-colors"
-                  >
-                      Почати спочатку
-                  </button>
-              ) : (
-                  <div />
-              )}
+  if (view === 'landing') {
+      return (
+          <div className="min-h-screen flex flex-col">
+              <Header onHomeClick={goToLanding} onStartBuilder={() => setView('builder')} />
+              <main className="flex-grow">
+                  <LandingPage />
+              </main>
+              <Footer />
           </div>
-        </div>
-      </div>
-  );
+      );
+  }
 
   return (
-    <div className="min-h-screen bg-green-50/50 font-sans text-gray-800 flex flex-col">
+    <div className="min-h-screen flex flex-col">
       <Header onHomeClick={goToLanding} onStartBuilder={() => setView('builder')} />
-      <main className="flex-grow py-8">
-        {view === 'landing' ? (
-            <LandingPage />
-        ) : (
-            <div className="container mx-auto px-4">
-              {renderBuilder()}
-            </div>
-        )}
-        <IntegratedSystemModal
-            isOpen={isIntegratedModalOpen}
-            onClose={() => {
-                setIsIntegratedModalOpen(false);
-                setSelectedProblem(null);
-                if (currentStep !== 1) {
-                    setCurrentStep(2);
-                }
-            }}
-            onSubmit={handleGenerateSystem}
-        />
+      <main className="flex-grow container mx-auto px-4 py-8">
+        <Stepper steps={steps} currentStep={currentStep} goToStep={goToStep} />
+        <div className="bg-white p-6 sm:p-8 rounded-xl shadow-lg animate-fade-in">
+            {renderStepContent()}
+        </div>
       </main>
+      <IntegratedSystemModal 
+        isOpen={isIntegratedModalOpen} 
+        onClose={() => setIsIntegratedModalOpen(false)}
+        onSubmit={handleGenerateSystem}
+      />
       <Footer />
     </div>
   );
