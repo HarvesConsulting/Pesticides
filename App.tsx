@@ -14,7 +14,7 @@ type Product = Fungicide | Insecticide;
 
 const topProducts = {
   fungicides: new Set(['Зорвек Інкантія', 'Ридоміл Голд Р', 'Сігнум', 'Квадріс', 'Медян Екстра']),
-  insecticides: new Set(['Белт', 'Радіант', 'Проклейм', 'Мовенто']), // Верімарк is excluded as it's for soil application
+  insecticides: new Set(['Белт', 'Радіант', 'Проклейм', 'Мовенто']),
 };
 
 const App: React.FC = () => {
@@ -83,197 +83,212 @@ const App: React.FC = () => {
     const plan = [];
     let lastTreatmentProductKeys = new Set<string>();
 
-    const isFungicide = (p: Product): p is Fungicide => 'bacteriosis' in p.controls;
-    const isInsecticide = (p: Product): p is Insecticide => 'aphids' in p.controls;
+    const isFungicide = (p: Product): p is Fungicide => 'category' in p;
+    const isInsecticide = (p: Product): p is Insecticide => !('category' in p);
 
-    const hasTargetOverlap = (p1: Product, p2: Product): boolean => {
-        if (isFungicide(p1) && isFungicide(p2)) {
-            return (p1.controls.bacteriosis && p2.controls.bacteriosis) ||
-                   (p1.controls.phytophthora && p2.controls.phytophthora) ||
-                   (p1.controls.rots && p2.controls.rots);
+    // Helper functions for tank mix rules
+    const isRidomilGoldR = (p: Product): boolean => p.productName === 'Ридоміл Голд Р';
+    const isBannedContactProduct = (p: Product): boolean => {
+      const ai = p.activeIngredient.toLowerCase();
+      if (isRidomilGoldR(p)) return false; 
+      return ai.includes('манкоцеб') || ai.includes('міді');
+    };
+    const wouldBeInvalidMix = (newProduct: Product, existingProducts: Product[]): boolean => {
+      if (isRidomilGoldR(newProduct)) {
+        return existingProducts.some(isBannedContactProduct);
+      }
+      if (isBannedContactProduct(newProduct)) {
+        return existingProducts.some(isRidomilGoldR);
+      }
+      return false;
+    };
+    
+    const getTargetsForProduct = (p: Product): Set<string> => {
+        const targets = new Set<string>();
+        if (isFungicide(p)) {
+            if (p.controls.bacteriosis) targets.add('bacteriosis');
+            if (p.controls.phytophthora) targets.add('phytophthora');
+            if (p.controls.rots) targets.add('rots');
+        } else if (isInsecticide(p)) {
+            if (p.controls.lepidoptera) targets.add('lepidoptera');
+            if (p.controls.coleoptera) targets.add('coleoptera');
+            if (p.controls.aphids || p.controls.thrips || p.controls.whiteflies || p.controls.mites) {
+                targets.add('sucking');
+            }
         }
-        if (isInsecticide(p1) && isInsecticide(p2)) {
-            const p1IsSucking = p1.controls.aphids || p1.controls.thrips || p1.controls.whiteflies || p1.controls.mites;
-            const p2IsSucking = p2.controls.aphids || p2.controls.thrips || p2.controls.whiteflies || p2.controls.mites;
-
-            return (p1.controls.lepidoptera && p2.controls.lepidoptera) ||
-                   (p1.controls.coleoptera && p2.controls.coleoptera) ||
-                   (p1IsSucking && p2IsSucking);
-        }
-        return false; // Different types (fungicide vs insecticide) can't overlap
+        return targets;
     };
 
-    // Phase 1: Treatments 1-3 (Flexible greedy approach, prioritize top products)
-    for (let i = 0; i < Math.min(numTreatments, 3); i++) {
+    const hasRedundantOverlap = (candidate: Product, existingProducts: Product[]): boolean => {
+        if (isFungicide(candidate) && candidate.category !== 2) return false;
+
+        const existingFlexibleProducts = existingProducts.filter(p => isInsecticide(p) || (isFungicide(p) && p.category === 2));
+        if (existingFlexibleProducts.length === 0) return false;
+
+        const candidateTargets = getTargetsForProduct(candidate);
+        if (candidateTargets.size === 0) return false;
+
+        const allExistingFlexibleTargets = new Set<string>();
+        existingFlexibleProducts.forEach(p => {
+            if ((isFungicide(candidate) && isFungicide(p)) || (isInsecticide(candidate) && isInsecticide(p))) {
+                getTargetsForProduct(p).forEach(target => allExistingFlexibleTargets.add(target));
+            }
+        });
+
+        for (const target of candidateTargets) {
+            if (!allExistingFlexibleTargets.has(target)) {
+                return false; // Found new coverage, so the overlap is not redundant
+            }
+        }
+
+        return true; // All of the candidate's targets are already covered. Redundant.
+    };
+
+
+    for (let i = 0; i < numTreatments; i++) {
+        const treatmentNumber = i + 1;
+        const treatmentProducts: Product[] = [];
+        
         const targets: { [key: string]: boolean } = {
             phytophthora: true, rots: true, bacteriosis: true,
             lepidoptera: true, coleoptera: true, sucking: true,
         };
-        const treatmentProducts: Product[] = [];
         
-        let productsPool = shuffle(allProducts.filter(p => {
-            const key = `${p.productName}|${p.activeIngredient}`;
-            return (usageCount.get(key) ?? 0) < 2 && !lastTreatmentProductKeys.has(key);
-        }));
-
-        // Greedily build the treatment
-        while (Object.values(targets).some(v => v === true) && treatmentProducts.length < 4 && productsPool.length > 0) {
-            let bestProduct: Product | null = null;
-            let bestScore = -1;
-            let bestProductIndex = -1;
-
-            const existingCat2Products = treatmentProducts.filter(p => p.category === 2);
-
-            productsPool.forEach((p, index) => {
-                if (treatmentProducts.length === 0 && p.category === 3) return;
-
-                // Rule: Don't add a Cat 2 if it overlaps with an existing Cat 2
-                if (p.category === 2 && existingCat2Products.some(existingP => hasTargetOverlap(p, existingP))) {
-                    return; // Skip this product
-                }
-
-                let score = 0;
-                if (isFungicide(p)) {
-                    if (targets.bacteriosis && p.controls.bacteriosis) score++;
-                    if (targets.phytophthora && p.controls.phytophthora) score++;
-                    if (targets.rots && p.controls.rots) score++;
-                    if (topProducts.fungicides.has(p.productName)) score += 5; // Prioritize top fungicides
-                } else if (isInsecticide(p)) {
-                    if (targets.lepidoptera && p.controls.lepidoptera) score++;
-                    if (targets.coleoptera && p.controls.coleoptera) score++;
-                    const isSucking = p.controls.aphids || p.controls.thrips || p.controls.whiteflies || p.controls.mites;
-                    if (targets.sucking && isSucking) score++;
-                    if (topProducts.insecticides.has(p.productName)) score += 5; // Prioritize top insecticides
-                }
-
-                if (score > bestScore) {
-                    bestScore = score;
-                    bestProduct = p;
-                    bestProductIndex = index;
-                }
-            });
-
-            if (bestScore > 0 && bestProduct) {
-                treatmentProducts.push(bestProduct);
-                productsPool.splice(bestProductIndex, 1);
-                
-                const key = `${bestProduct.productName}|${bestProduct.activeIngredient}`;
-                usageCount.set(key, (usageCount.get(key) ?? 0) + 1);
-
-                if (isFungicide(bestProduct)) {
-                    if (bestProduct.controls.bacteriosis) targets.bacteriosis = false;
-                    if (bestProduct.controls.phytophthora) targets.phytophthora = false;
-                    if (bestProduct.controls.rots) targets.rots = false;
-                } else if (isInsecticide(bestProduct)) {
-                    if (bestProduct.controls.lepidoptera) targets.lepidoptera = false;
-                    if (bestProduct.controls.coleoptera) targets.coleoptera = false;
-                    const isSucking = bestProduct.controls.aphids || bestProduct.controls.thrips || bestProduct.controls.whiteflies || bestProduct.controls.mites;
-                    if (isSucking) targets.sucking = false;
-                }
-            } else {
-                break;
+        const updateTargets = (product: Product) => {
+            if (isFungicide(product)) {
+                if (product.controls.bacteriosis) targets.bacteriosis = false;
+                if (product.controls.phytophthora) targets.phytophthora = false;
+                if (product.controls.rots) targets.rots = false;
+            } else if (isInsecticide(product)) {
+                if (product.controls.lepidoptera) targets.lepidoptera = false;
+                if (product.controls.coleoptera) targets.coleoptera = false;
+                const isSucking = product.controls.aphids || product.controls.thrips || product.controls.whiteflies || product.controls.mites;
+                if (isSucking) targets.sucking = false;
             }
-        }
+        };
 
-        plan.push({
-            treatmentNumber: i + 1,
-            products: treatmentProducts,
-            uncoveredTargets: Object.keys(targets).filter(t => targets[t as keyof typeof targets])
-        });
-
-        lastTreatmentProductKeys.clear();
-        treatmentProducts.forEach(p => lastTreatmentProductKeys.add(`${p.productName}|${p.activeIngredient}`));
-    }
-
-    // Phase 2: Treatments 4+ (Strict combinatorial approach, prioritize top products)
-    for (let i = 3; i < numTreatments; i++) {
-        const treatmentProducts: Product[] = [];
-        const coveredTargets = new Set<string>();
-
-        const availableProductsForThisTurn = shuffle(allProducts.filter(p => {
-            const key = `${p.productName}|${p.activeIngredient}`;
-            const isCat1Fungicide = isFungicide(p) && p.category === 1;
-            
-            return !isCat1Fungicide && 
-                   (usageCount.get(key) ?? 0) < 2 && 
-                   !lastTreatmentProductKeys.has(key);
-        }));
-
-        const addProductToTreatment = (product: Product) => {
+        const addProduct = (product: Product): boolean => {
+            if (treatmentProducts.length >= 4) return false;
             treatmentProducts.push(product);
             const key = `${product.productName}|${product.activeIngredient}`;
             usageCount.set(key, (usageCount.get(key) ?? 0) + 1);
+            updateTargets(product);
+            return true;
+        };
+        
+        const initialProductsPoolForTurn = shuffle(allProducts.filter(p => {
+            const key = `${p.productName}|${p.activeIngredient}`;
+            const isCat1Fungicide = isFungicide(p) && p.category === 1;
+            return (usageCount.get(key) ?? 0) < 2 &&
+                   !lastTreatmentProductKeys.has(key) &&
+                   !(treatmentNumber > 3 && isCat1Fungicide);
+        }));
 
-            if (isFungicide(product)) {
-                if (product.controls.phytophthora) coveredTargets.add('phytophthora');
-                if (product.controls.rots) coveredTargets.add('rots');
-                if (product.controls.bacteriosis) coveredTargets.add('bacteriosis');
-            } else if (isInsecticide(product)) {
-                if (product.controls.lepidoptera) coveredTargets.add('lepidoptera');
-                if (product.controls.coleoptera) coveredTargets.add('coleoptera');
-                if (product.controls.aphids || product.controls.thrips || product.controls.whiteflies || product.controls.mites) {
-                    coveredTargets.add('sucking');
+        // --- Main Selection Logic ---
+        if (treatmentNumber <= 3) { // Phase 1: Greedy
+            let greedyPool = [...initialProductsPoolForTurn];
+            while (Object.values(targets).some(v => v === true) && treatmentProducts.length < 4 && greedyPool.length > 0) {
+                let bestProduct: Product | null = null;
+                let bestScore = -1;
+                let bestProductIndex = -1;
+                
+                greedyPool.forEach((p, index) => {
+                    if ((isFungicide(p) && treatmentProducts.length === 0 && p.category === 3) ||
+                        hasRedundantOverlap(p, treatmentProducts) ||
+                        wouldBeInvalidMix(p, treatmentProducts)) {
+                        return;
+                    }
+
+                    let coverage = 0;
+                    if (isFungicide(p)) {
+                        if (targets.bacteriosis && p.controls.bacteriosis) coverage++;
+                        if (targets.phytophthora && p.controls.phytophthora) coverage++;
+                        if (targets.rots && p.controls.rots) coverage++;
+                    } else if (isInsecticide(p)) {
+                        if (targets.lepidoptera && p.controls.lepidoptera) coverage++;
+                        if (targets.coleoptera && p.controls.coleoptera) coverage++;
+                        if (targets.sucking && (p.controls.aphids || p.controls.thrips || p.controls.whiteflies || p.controls.mites)) coverage++;
+                    }
+
+                    if (coverage === 0) return;
+
+                    const isTop = (isFungicide(p) && topProducts.fungicides.has(p.productName)) || (isInsecticide(p) && topProducts.insecticides.has(p.productName));
+                    const score = coverage * 10 + (isTop ? 1 : 0);
+
+                    if (score > bestScore) {
+                        bestScore = score;
+                        bestProduct = p;
+                        bestProductIndex = index;
+                    }
+                });
+
+                if (bestProduct) {
+                    addProduct(bestProduct);
+                    greedyPool.splice(bestProductIndex, 1);
+                } else {
+                    break;
                 }
             }
+        } else { // Phase 2: Combinatorial
+            const findAndAdd = (target: string) => {
+                if (!targets[target] || treatmentProducts.length >= 4) return;
+                
+                const isTargetMatch = (p: Product) => {
+                    if (target === 'phytophthora') return isFungicide(p) && p.controls.phytophthora;
+                    if (target === 'rots') return isFungicide(p) && p.controls.rots;
+                    if (target === 'lepidoptera') return isInsecticide(p) && p.controls.lepidoptera;
+                    if (target === 'coleoptera') return isInsecticide(p) && p.controls.coleoptera;
+                    if (target === 'sucking') return isInsecticide(p) && (p.controls.aphids || p.controls.thrips || p.controls.whiteflies || p.controls.mites);
+                    return false;
+                };
+
+                const isTop = (p: Product) => (isFungicide(p) && topProducts.fungicides.has(p.productName)) || (isInsecticide(p) && topProducts.insecticides.has(p.productName));
+
+                const pool = initialProductsPoolForTurn.filter(p => !treatmentProducts.includes(p));
+                let candidate = pool.find(p => isTargetMatch(p) && isTop(p) && !wouldBeInvalidMix(p, treatmentProducts) && !hasRedundantOverlap(p, treatmentProducts)) ||
+                                pool.find(p => isTargetMatch(p) && !wouldBeInvalidMix(p, treatmentProducts) && !hasRedundantOverlap(p, treatmentProducts));
+
+                if (candidate) addProduct(candidate);
+            };
+            findAndAdd('phytophthora');
+            findAndAdd('rots');
+            findAndAdd('lepidoptera');
+            findAndAdd('coleoptera');
+            findAndAdd('sucking');
+        }
+        
+        // --- Post-check and Fix Logic ---
+        const postCheckAndFix = (target: keyof typeof targets, priorityList: string[], fullProductPool: Product[]) => {
+            if (targets[target] && treatmentProducts.length < 4) {
+                let productToAdd: Product | null = null;
+                for (const name of priorityList) {
+                    // Search in the full pool for this turn, not a filtered one
+                    const candidate = fullProductPool.find(p => 
+                        (name === 'Децис' ? p.productName.startsWith('Децис') : p.productName === name) &&
+                        !treatmentProducts.some(tp => tp.productName === p.productName) &&
+                        (usageCount.get(`${p.productName}|${p.activeIngredient}`) ?? 0) < 2 &&
+                        !lastTreatmentProductKeys.has(`${p.productName}|${p.activeIngredient}`)
+                    );
+                    if (candidate) {
+                        // For post-fix, we ignore the redundant overlap rule to ensure coverage
+                        if (!wouldBeInvalidMix(candidate, treatmentProducts)) {
+                            productToAdd = candidate;
+                            break;
+                        }
+                    }
+                }
+                if (productToAdd) addProduct(productToAdd);
+            }
         };
 
-        const findAndAddProduct = (target: string) => {
-            if (coveredTargets.has(target) || treatmentProducts.length >= 4) return;
-            
-            const productPool = availableProductsForThisTurn.filter(p => 
-                !treatmentProducts.some(tp => `${tp.productName}|${tp.activeIngredient}` === `${p.productName}|${p.activeIngredient}`)
-            );
-            
-            let candidate: Product | undefined;
+        postCheckAndFix('bacteriosis', ['Казумін 2Л', 'Серенада'], allProducts);
+        postCheckAndFix('coleoptera', ['Моспілан', 'Актара', 'Децис', 'Карате Зеон'], allProducts);
+        postCheckAndFix('lepidoptera', ['Белт', 'Радіант', 'Проклейм', 'Ампліго', 'Кораген'], allProducts);
 
-            const isTargetMatch = (p: Product): boolean => {
-                if (target === 'phytophthora') return isFungicide(p) && p.controls.phytophthora;
-                if (target === 'rots') return isFungicide(p) && p.controls.rots;
-                if (target === 'lepidoptera') return isInsecticide(p) && p.controls.lepidoptera;
-                if (target === 'coleoptera') return isInsecticide(p) && p.controls.coleoptera;
-                if (target === 'sucking') return isInsecticide(p) && (p.controls.aphids || p.controls.thrips || p.controls.whiteflies || p.controls.mites);
-                return false;
-            };
-
-            const isTopProduct = (p: Product): boolean => {
-                return (isFungicide(p) && topProducts.fungicides.has(p.productName)) ||
-                       (isInsecticide(p) && topProducts.insecticides.has(p.productName));
-            }
-
-            const checkCat2Overlap = (p: Product): boolean => {
-                if (p.category !== 2) return false;
-                const existingCat2Products = treatmentProducts.filter(tp => tp.category === 2);
-                return existingCat2Products.some(existingP => hasTargetOverlap(p, existingP));
-            };
-
-            // Prioritize top products, checking for overlap
-            candidate = productPool.find(p => isTargetMatch(p) && isTopProduct(p) && !checkCat2Overlap(p));
-
-            // If no top product found, find any matching product, checking for overlap
-            if (!candidate) {
-                candidate = productPool.find(p => isTargetMatch(p) && !checkCat2Overlap(p));
-            }
-            
-            if (candidate) {
-                addProductToTreatment(candidate);
-            }
-        };
-
-        // Build the combination for treatment 4+
-        findAndAddProduct('phytophthora');
-        findAndAddProduct('rots');
-        findAndAddProduct('lepidoptera');
-        findAndAddProduct('coleoptera');
-        findAndAddProduct('sucking');
-
+        // --- Finalize and store ---
         const allPossibleTargets = ['phytophthora', 'rots', 'bacteriosis', 'lepidoptera', 'coleoptera', 'sucking'];
-        const uncoveredTargets = allPossibleTargets.filter(t => !coveredTargets.has(t));
-
-        plan.push({
-            treatmentNumber: i + 1,
-            products: treatmentProducts,
-            uncoveredTargets: uncoveredTargets
-        });
+        const uncoveredTargets = allPossibleTargets.filter(t => targets[t]);
+        plan.push({ treatmentNumber, products: treatmentProducts, uncoveredTargets });
 
         lastTreatmentProductKeys.clear();
         treatmentProducts.forEach(p => lastTreatmentProductKeys.add(`${p.productName}|${p.activeIngredient}`));

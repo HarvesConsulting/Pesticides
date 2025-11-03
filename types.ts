@@ -47,7 +47,6 @@ export interface Fungicide {
 export interface Insecticide {
     activeIngredient: string;
     productName: string;
-    category: 1 | 2 | 3;
     controls: {
         aphids: boolean;
         thrips: boolean;

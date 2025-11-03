@@ -183,43 +183,43 @@ const tomatoFungicides: Fungicide[] = [
 ];
 
 const tomatoInsecticides: Insecticide[] = [
-    { activeIngredient: 'спинеторам', productName: 'Радіант', category: 2, controls: { aphids: false, thrips: true, whiteflies: false, mites: false, lepidoptera: true, coleoptera: false } },
-    { activeIngredient: 'імідаклоприд+біфентрин', productName: 'Галіл', category: 2, controls: { aphids: true, thrips: true, whiteflies: true, mites: false, lepidoptera: true, coleoptera: true } },
-    { activeIngredient: 'пірипроксифен', productName: 'Адмірал', category: 2, controls: { aphids: false, thrips: false, whiteflies: true, mites: false, lepidoptera: false, coleoptera: false } },
-    { activeIngredient: 'імідаклоприд', productName: 'Конфідор', category: 2, controls: { aphids: true, thrips: true, whiteflies: true, mites: false, lepidoptera: false, coleoptera: false } },
-    { activeIngredient: 'піридабен', productName: 'Санмайт', category: 2, controls: { aphids: false, thrips: false, whiteflies: false, mites: true, lepidoptera: false, coleoptera: false } },
-    { activeIngredient: 'циперметрин', productName: 'Арріво', category: 2, controls: { aphids: true, thrips: false, whiteflies: false, mites: false, lepidoptera: false, coleoptera: true } },
-    { activeIngredient: 'флубендіамід', productName: 'Белт', category: 2, controls: { aphids: false, thrips: false, whiteflies: false, mites: false, lepidoptera: true, coleoptera: false } },
-    { activeIngredient: 'спиромезифен+абамектин', productName: 'Оберон Рапід', category: 2, controls: { aphids: true, thrips: false, whiteflies: true, mites: true, lepidoptera: false, coleoptera: false } },
-    { activeIngredient: 'бупрофезин', productName: 'Апплауд', category: 2, controls: { aphids: false, thrips: false, whiteflies: true, mites: false, lepidoptera: false, coleoptera: false } },
-    { activeIngredient: 'ацетаміприд+лямбда-цигалотрин', productName: 'Камінарі', category: 2, controls: { aphids: true, thrips: true, whiteflies: false, mites: false, lepidoptera: true, coleoptera: true } },
-    { activeIngredient: 'піриміфос-метил', productName: 'Актеллік', category: 2, controls: { aphids: true, thrips: true, whiteflies: true, mites: true, lepidoptera: false, coleoptera: false } },
-    { activeIngredient: 'абамектин', productName: 'Акарамік', category: 2, controls: { aphids: false, thrips: true, whiteflies: false, mites: true, lepidoptera: false, coleoptera: false } },
-    { activeIngredient: 'фіпроніл', productName: 'Регент', category: 2, controls: { aphids: false, thrips: false, whiteflies: false, mites: false, lepidoptera: true, coleoptera: true } },
-    { activeIngredient: 'тефлутрин', productName: 'Форс', category: 2, controls: { aphids: false, thrips: false, whiteflies: false, mites: false, lepidoptera: true, coleoptera: true } },
-    { activeIngredient: 'хлорантраніліпрол+тіаметоксам', productName: 'Воліам Флексі', category: 2, controls: { aphids: true, thrips: true, whiteflies: false, mites: false, lepidoptera: true, coleoptera: true } },
-    { activeIngredient: 'абамектин', productName: 'Вертімек', category: 2, controls: { aphids: false, thrips: true, whiteflies: false, mites: true, lepidoptera: false, coleoptera: false } },
-    { activeIngredient: 'біфентрин', productName: 'Талстар', category: 2, controls: { aphids: true, thrips: false, whiteflies: false, mites: true, lepidoptera: false, coleoptera: false } },
-    { activeIngredient: 'люфенурон', productName: 'Матч', category: 2, controls: { aphids: false, thrips: true, whiteflies: true, mites: false, lepidoptera: true, coleoptera: false } },
-    { activeIngredient: 'хлорантраніліпрол', productName: 'Кораген', category: 2, controls: { aphids: false, thrips: false, whiteflies: false, mites: false, lepidoptera: true, coleoptera: false } },
-    { activeIngredient: 'сульфоксафлор', productName: 'Трансформ', category: 2, controls: { aphids: true, thrips: false, whiteflies: true, mites: false, lepidoptera: false, coleoptera: false } },
-    { activeIngredient: 'Емамектину бензоат', productName: 'Проклейм', category: 2, controls: { aphids: false, thrips: true, whiteflies: false, mites: false, lepidoptera: true, coleoptera: false } },
-    { activeIngredient: 'Лямбда-цигалотрин+тіаметоксам', productName: 'Енжіо', category: 2, controls: { aphids: true, thrips: true, whiteflies: false, mites: false, lepidoptera: false, coleoptera: true } },
-    { activeIngredient: 'тіаметоксам', productName: 'Актара', category: 2, controls: { aphids: true, thrips: true, whiteflies: false, mites: false, lepidoptera: false, coleoptera: true } },
-    { activeIngredient: 'дельтаметрин', productName: 'Децис ф Люкс', category: 2, controls: { aphids: true, thrips: true, whiteflies: false, mites: false, lepidoptera: true, coleoptera: true } },
-    { activeIngredient: 'дельтаметрин+тіаклоприд', productName: 'Протеус', category: 2, controls: { aphids: true, thrips: true, whiteflies: true, mites: false, lepidoptera: true, coleoptera: true } },
-    { activeIngredient: 'хлорантраніліпрол+лямбда-цигалотрин', productName: 'Ампліго', category: 2, controls: { aphids: true, thrips: true, whiteflies: false, mites: false, lepidoptera: true, coleoptera: false } },
-    { activeIngredient: 'ацетаміприд', productName: 'Моспілан', category: 2, controls: { aphids: true, thrips: true, whiteflies: true, mites: false, lepidoptera: false, coleoptera: true } },
-    { activeIngredient: 'лямбда-цигалотрин', productName: 'Карате Зеон', category: 2, controls: { aphids: true, thrips: true, whiteflies: true, mites: false, lepidoptera: true, coleoptera: true } },
-    { activeIngredient: 'циантраніліпрол', productName: 'Ексірель', category: 2, controls: { aphids: true, thrips: true, whiteflies: true, mites: false, lepidoptera: true, coleoptera: false } },
-    { activeIngredient: 'ацетаміприд+біфентрин', productName: 'Аркеро', category: 2, controls: { aphids: true, thrips: true, whiteflies: true, mites: false, lepidoptera: true, coleoptera: true } },
-    { activeIngredient: 'ацетаміприд+новалурон', productName: 'Корморан', category: 2, controls: { aphids: true, thrips: true, whiteflies: true, mites: false, lepidoptera: true, coleoptera: true } },
-    { activeIngredient: 'циантраніліпрол+абамектин', productName: 'Лірум', category: 2, controls: { aphids: true, thrips: true, whiteflies: true, mites: true, lepidoptera: true, coleoptera: false } },
-    { activeIngredient: 'спіротетрамат', productName: 'Мовенто', category: 2, controls: { aphids: true, thrips: true, whiteflies: true, mites: true, lepidoptera: false, coleoptera: false } },
-    { activeIngredient: 'ацетаміприд+лямбда-цигалотрин', productName: 'Іназума', category: 2, controls: { aphids: true, thrips: true, whiteflies: true, mites: false, lepidoptera: true, coleoptera: true } },
-    { activeIngredient: 'спіротетрамат+абамектин', productName: 'Джаванто', category: 2, controls: { aphids: true, thrips: true, whiteflies: true, mites: true, lepidoptera: false, coleoptera: false } },
-    { activeIngredient: 'тетраніліпрол', productName: 'Ваєго', category: 2, controls: { aphids: false, thrips: false, whiteflies: false, mites: false, lepidoptera: true, coleoptera: true } },
-    { activeIngredient: 'диметоат+гамма-цигалотрин', productName: 'Данадим Мікс', category: 2, controls: { aphids: true, thrips: true, whiteflies: true, mites: true, lepidoptera: true, coleoptera: true } },
+    { activeIngredient: 'спинеторам', productName: 'Радіант', controls: { aphids: false, thrips: true, whiteflies: false, mites: false, lepidoptera: true, coleoptera: false } },
+    { activeIngredient: 'імідаклоприд+біфентрин', productName: 'Галіл', controls: { aphids: true, thrips: true, whiteflies: true, mites: false, lepidoptera: true, coleoptera: true } },
+    { activeIngredient: 'пірипроксифен', productName: 'Адмірал', controls: { aphids: false, thrips: false, whiteflies: true, mites: false, lepidoptera: false, coleoptera: false } },
+    { activeIngredient: 'імідаклоприд', productName: 'Конфідор', controls: { aphids: true, thrips: true, whiteflies: true, mites: false, lepidoptera: false, coleoptera: false } },
+    { activeIngredient: 'піридабен', productName: 'Санмайт', controls: { aphids: false, thrips: false, whiteflies: false, mites: true, lepidoptera: false, coleoptera: false } },
+    { activeIngredient: 'циперметрин', productName: 'Арріво', controls: { aphids: true, thrips: false, whiteflies: false, mites: false, lepidoptera: false, coleoptera: true } },
+    { activeIngredient: 'флубендіамід', productName: 'Белт', controls: { aphids: false, thrips: false, whiteflies: false, mites: false, lepidoptera: true, coleoptera: false } },
+    { activeIngredient: 'спиромезифен+абамектин', productName: 'Оберон Рапід', controls: { aphids: true, thrips: false, whiteflies: true, mites: true, lepidoptera: false, coleoptera: false } },
+    { activeIngredient: 'бупрофезин', productName: 'Апплауд', controls: { aphids: false, thrips: false, whiteflies: true, mites: false, lepidoptera: false, coleoptera: false } },
+    { activeIngredient: 'ацетаміприд+лямбда-цигалотрин', productName: 'Камінарі', controls: { aphids: true, thrips: true, whiteflies: false, mites: false, lepidoptera: true, coleoptera: true } },
+    { activeIngredient: 'піриміфос-метил', productName: 'Актеллік', controls: { aphids: true, thrips: true, whiteflies: true, mites: true, lepidoptera: false, coleoptera: false } },
+    { activeIngredient: 'абамектин', productName: 'Акарамік', controls: { aphids: false, thrips: true, whiteflies: false, mites: true, lepidoptera: false, coleoptera: false } },
+    { activeIngredient: 'фіпроніл', productName: 'Регент', controls: { aphids: false, thrips: false, whiteflies: false, mites: false, lepidoptera: true, coleoptera: true } },
+    { activeIngredient: 'тефлутрин', productName: 'Форс', controls: { aphids: false, thrips: false, whiteflies: false, mites: false, lepidoptera: true, coleoptera: true } },
+    { activeIngredient: 'хлорантраніліпрол+тіаметоксам', productName: 'Воліам Флексі', controls: { aphids: true, thrips: true, whiteflies: false, mites: false, lepidoptera: true, coleoptera: true } },
+    { activeIngredient: 'абамектин', productName: 'Вертімек', controls: { aphids: false, thrips: true, whiteflies: false, mites: true, lepidoptera: false, coleoptera: false } },
+    { activeIngredient: 'біфентрин', productName: 'Талстар', controls: { aphids: true, thrips: false, whiteflies: false, mites: true, lepidoptera: false, coleoptera: false } },
+    { activeIngredient: 'люфенурон', productName: 'Матч', controls: { aphids: false, thrips: true, whiteflies: true, mites: false, lepidoptera: true, coleoptera: false } },
+    { activeIngredient: 'хлорантраніліпрол', productName: 'Кораген', controls: { aphids: false, thrips: false, whiteflies: false, mites: false, lepidoptera: true, coleoptera: false } },
+    { activeIngredient: 'сульфоксафлор', productName: 'Трансформ', controls: { aphids: true, thrips: false, whiteflies: true, mites: false, lepidoptera: false, coleoptera: false } },
+    { activeIngredient: 'Емамектину бензоат', productName: 'Проклейм', controls: { aphids: false, thrips: true, whiteflies: false, mites: false, lepidoptera: true, coleoptera: false } },
+    { activeIngredient: 'Лямбда-цигалотрин+тіаметоксам', productName: 'Енжіо', controls: { aphids: true, thrips: true, whiteflies: false, mites: false, lepidoptera: false, coleoptera: true } },
+    { activeIngredient: 'тіаметоксам', productName: 'Актара', controls: { aphids: true, thrips: true, whiteflies: false, mites: false, lepidoptera: false, coleoptera: true } },
+    { activeIngredient: 'дельтаметрин', productName: 'Децис ф Люкс', controls: { aphids: true, thrips: true, whiteflies: false, mites: false, lepidoptera: true, coleoptera: true } },
+    { activeIngredient: 'дельтаметрин+тіаклоприд', productName: 'Протеус', controls: { aphids: true, thrips: true, whiteflies: true, mites: false, lepidoptera: true, coleoptera: true } },
+    { activeIngredient: 'хлорантраніліпрол+лямбда-цигалотрин', productName: 'Ампліго', controls: { aphids: true, thrips: true, whiteflies: false, mites: false, lepidoptera: true, coleoptera: false } },
+    { activeIngredient: 'ацетаміприд', productName: 'Моспілан', controls: { aphids: true, thrips: true, whiteflies: true, mites: false, lepidoptera: false, coleoptera: true } },
+    { activeIngredient: 'лямбда-цигалотрин', productName: 'Карате Зеон', controls: { aphids: true, thrips: true, whiteflies: true, mites: false, lepidoptera: true, coleoptera: true } },
+    { activeIngredient: 'циантраніліпрол', productName: 'Ексірель', controls: { aphids: true, thrips: true, whiteflies: true, mites: false, lepidoptera: true, coleoptera: false } },
+    { activeIngredient: 'ацетаміприд+біфентрин', productName: 'Аркеро', controls: { aphids: true, thrips: true, whiteflies: true, mites: false, lepidoptera: true, coleoptera: true } },
+    { activeIngredient: 'ацетаміприд+новалурон', productName: 'Корморан', controls: { aphids: true, thrips: true, whiteflies: true, mites: false, lepidoptera: true, coleoptera: true } },
+    { activeIngredient: 'циантраніліпрол+абамектин', productName: 'Лірум', controls: { aphids: true, thrips: true, whiteflies: true, mites: true, lepidoptera: true, coleoptera: false } },
+    { activeIngredient: 'спіротетрамат', productName: 'Мовенто', controls: { aphids: true, thrips: true, whiteflies: true, mites: true, lepidoptera: false, coleoptera: false } },
+    { activeIngredient: 'ацетаміприд+лямбда-цигалотрин', productName: 'Іназума', controls: { aphids: true, thrips: true, whiteflies: true, mites: false, lepidoptera: true, coleoptera: true } },
+    { activeIngredient: 'спіротетрамат+абамектин', productName: 'Джаванто', controls: { aphids: true, thrips: true, whiteflies: true, mites: true, lepidoptera: false, coleoptera: false } },
+    { activeIngredient: 'тетраніліпрол', productName: 'Ваєго', controls: { aphids: false, thrips: false, whiteflies: false, mites: false, lepidoptera: true, coleoptera: true } },
+    { activeIngredient: 'диметоат+гамма-цигалотрин', productName: 'Данадим Мікс', controls: { aphids: true, thrips: true, whiteflies: true, mites: true, lepidoptera: true, coleoptera: true } },
 ];
 
 const pepperFungicides: Fungicide[] = [
@@ -245,24 +245,24 @@ const pepperFungicides: Fungicide[] = [
 ];
 
 const pepperInsecticides: Insecticide[] = [
-    { activeIngredient: 'імідаклоприд', productName: 'Конфідор', category: 2, controls: { aphids: true, thrips: true, whiteflies: false, mites: false, lepidoptera: false, coleoptera: false } },
-    { activeIngredient: 'спинеторам', productName: 'Радіант', category: 2, controls: { aphids: false, thrips: true, whiteflies: false, mites: false, lepidoptera: true, coleoptera: false } },
-    { activeIngredient: 'спіносад', productName: 'Спінтор', category: 2, controls: { aphids: false, thrips: true, whiteflies: false, mites: false, lepidoptera: false, coleoptera: false } },
-    { activeIngredient: 'спіротетрамат', productName: 'Мовенто', category: 2, controls: { aphids: true, thrips: true, whiteflies: false, mites: false, lepidoptera: false, coleoptera: false } },
-    { activeIngredient: 'диметоат', productName: 'Диметоат', category: 2, controls: { aphids: true, thrips: true, whiteflies: false, mites: false, lepidoptera: false, coleoptera: false } },
-    { activeIngredient: 'флонікамід', productName: 'Теппекі', category: 2, controls: { aphids: true, thrips: true, whiteflies: false, mites: false, lepidoptera: false, coleoptera: false } },
-    { activeIngredient: 'індоксакарб', productName: 'Авант (к.с)', category: 2, controls: { aphids: false, thrips: false, whiteflies: false, mites: false, lepidoptera: true, coleoptera: true } },
-    { activeIngredient: 'емамектину бензоат', productName: 'Проклейм', category: 2, controls: { aphids: false, thrips: true, whiteflies: false, mites: false, lepidoptera: true, coleoptera: false } },
-    { activeIngredient: 'хлорантраніліпрол', productName: 'Кораген', category: 2, controls: { aphids: false, thrips: false, whiteflies: false, mites: false, lepidoptera: true, coleoptera: false } },
-    { activeIngredient: 'ацетаміприд', productName: 'Моспілан', category: 2, controls: { aphids: true, thrips: false, whiteflies: false, mites: false, lepidoptera: false, coleoptera: false } },
-    { activeIngredient: 'піметрозин', productName: 'Пленум', category: 2, controls: { aphids: true, thrips: false, whiteflies: false, mites: false, lepidoptera: true, coleoptera: false } },
-    { activeIngredient: 'біфентрин', productName: 'Біфентрин', category: 2, controls: { aphids: false, thrips: false, whiteflies: false, mites: true, lepidoptera: false, coleoptera: false } },
-    { activeIngredient: 'абамектин', productName: 'Абамектин', category: 2, controls: { aphids: false, thrips: false, whiteflies: false, mites: true, lepidoptera: false, coleoptera: false } },
-    { activeIngredient: 'сульфоксафлор', productName: 'Трансформ', category: 2, controls: { aphids: true, thrips: false, whiteflies: true, mites: false, lepidoptera: false, coleoptera: false } },
-    { activeIngredient: 'абамектин', productName: 'Вертімек', category: 2, controls: { aphids: false, thrips: true, whiteflies: true, mites: false, lepidoptera: false, coleoptera: false } },
-    { activeIngredient: 'пірипроксифен', productName: 'Адмірал', category: 2, controls: { aphids: false, thrips: false, whiteflies: true, mites: false, lepidoptera: false, coleoptera: false } },
-    { activeIngredient: 'лямбда-цигалотрин', productName: 'Карате Зеон', category: 2, controls: { aphids: true, thrips: true, whiteflies: true, mites: true, lepidoptera: true, coleoptera: true } },
-    { activeIngredient: 'спиромезифен+абамектин', productName: 'Оберон Рапід', category: 2, controls: { aphids: false, thrips: false, whiteflies: false, mites: true, lepidoptera: true, coleoptera: false } },
+    { activeIngredient: 'імідаклоприд', productName: 'Конфідор', controls: { aphids: true, thrips: true, whiteflies: false, mites: false, lepidoptera: false, coleoptera: false } },
+    { activeIngredient: 'спинеторам', productName: 'Радіант', controls: { aphids: false, thrips: true, whiteflies: false, mites: false, lepidoptera: true, coleoptera: false } },
+    { activeIngredient: 'спіносад', productName: 'Спінтор', controls: { aphids: false, thrips: true, whiteflies: false, mites: false, lepidoptera: false, coleoptera: false } },
+    { activeIngredient: 'спіротетрамат', productName: 'Мовенто', controls: { aphids: true, thrips: true, whiteflies: false, mites: false, lepidoptera: false, coleoptera: false } },
+    { activeIngredient: 'диметоат', productName: 'Диметоат', controls: { aphids: true, thrips: true, whiteflies: false, mites: false, lepidoptera: false, coleoptera: false } },
+    { activeIngredient: 'флонікамід', productName: 'Теппекі', controls: { aphids: true, thrips: true, whiteflies: false, mites: false, lepidoptera: false, coleoptera: false } },
+    { activeIngredient: 'індоксакарб', productName: 'Авант (к.с)', controls: { aphids: false, thrips: false, whiteflies: false, mites: false, lepidoptera: true, coleoptera: true } },
+    { activeIngredient: 'емамектину бензоат', productName: 'Проклейм', controls: { aphids: false, thrips: true, whiteflies: false, mites: false, lepidoptera: true, coleoptera: false } },
+    { activeIngredient: 'хлорантраніліпрол', productName: 'Кораген', controls: { aphids: false, thrips: false, whiteflies: false, mites: false, lepidoptera: true, coleoptera: false } },
+    { activeIngredient: 'ацетаміприд', productName: 'Моспілан', controls: { aphids: true, thrips: false, whiteflies: false, mites: false, lepidoptera: false, coleoptera: false } },
+    { activeIngredient: 'піметрозин', productName: 'Пленум', controls: { aphids: true, thrips: false, whiteflies: false, mites: false, lepidoptera: true, coleoptera: false } },
+    { activeIngredient: 'біфентрин', productName: 'Балазо', controls: { aphids: true, thrips: true, whiteflies: true, mites: true, lepidoptera: true, coleoptera: true } },
+    { activeIngredient: 'абамектин', productName: 'Акарамік', controls: { aphids: true, thrips: true, whiteflies: true, mites: true, lepidoptera: true, coleoptera: true } },
+    { activeIngredient: 'сульфоксафлор', productName: 'Трансформ', controls: { aphids: true, thrips: false, whiteflies: true, mites: false, lepidoptera: false, coleoptera: false } },
+    { activeIngredient: 'абамектин', productName: 'Вертімек', controls: { aphids: false, thrips: true, whiteflies: true, mites: false, lepidoptera: false, coleoptera: false } },
+    { activeIngredient: 'пірипроксифен', productName: 'Адмірал', controls: { aphids: false, thrips: false, whiteflies: true, mites: false, lepidoptera: false, coleoptera: false } },
+    { activeIngredient: 'лямбда-цигалотрин', productName: 'Карате Зеон', controls: { aphids: true, thrips: true, whiteflies: true, mites: true, lepidoptera: true, coleoptera: true } },
+    { activeIngredient: 'спиромезифен+абамектин', productName: 'Оберон Рапід', controls: { aphids: false, thrips: false, whiteflies: false, mites: true, lepidoptera: true, coleoptera: false } },
 ];
 
 const cabbageHerbicides: Herbicide[] = [
@@ -413,22 +413,22 @@ const cabbageFungicides: Fungicide[] = [
 ];
 
 const cabbageInsecticides: Insecticide[] = [
-    { activeIngredient: 'хлорантраніліпрол+лямбда-цигалотрин', productName: 'Ампліго', category: 2, controls: { aphids: true, thrips: true, whiteflies: false, mites: false, lepidoptera: true, coleoptera: false } },
-    { activeIngredient: 'тіаметоксам+лямбда-цигалотрин', productName: 'Енжіо', category: 2, controls: { aphids: true, thrips: false, whiteflies: false, mites: false, lepidoptera: true, coleoptera: true } },
-    { activeIngredient: 'Емамектину бензоат', productName: 'Проклейм', category: 2, controls: { aphids: false, thrips: false, whiteflies: false, mites: false, lepidoptera: true, coleoptera: false } },
-    { activeIngredient: 'тіаметоксам', productName: 'Актара', category: 2, controls: { aphids: true, thrips: false, whiteflies: true, mites: false, lepidoptera: false, coleoptera: true } },
-    { activeIngredient: 'абамектин', productName: 'Вертімек', category: 2, controls: { aphids: false, thrips: true, whiteflies: false, mites: true, lepidoptera: false, coleoptera: false } },
-    { activeIngredient: 'лямбда-цигалотрин', productName: 'Карате Зеон', category: 2, controls: { aphids: true, thrips: true, whiteflies: false, mites: false, lepidoptera: true, coleoptera: true } },
-    { activeIngredient: 'ацетаміприд', productName: 'Моспілан', category: 2, controls: { aphids: true, thrips: true, whiteflies: true, mites: false, lepidoptera: false, coleoptera: true } },
-    { activeIngredient: 'хлорантраніліпрол', productName: 'Кораген', category: 2, controls: { aphids: false, thrips: false, whiteflies: false, mites: false, lepidoptera: true, coleoptera: true } },
-    { activeIngredient: 'дельтаметрин', productName: 'Децис профі', category: 2, controls: { aphids: true, thrips: true, whiteflies: false, mites: false, lepidoptera: true, coleoptera: true } },
-    { activeIngredient: 'флубендіамід', productName: 'Белт', category: 2, controls: { aphids: false, thrips: false, whiteflies: false, mites: false, lepidoptera: true, coleoptera: false } },
-    { activeIngredient: 'спинеторам', productName: 'Радіант', category: 2, controls: { aphids: false, thrips: true, whiteflies: false, mites: false, lepidoptera: true, coleoptera: false } },
-    { activeIngredient: 'люфенурон', productName: 'Матч', category: 2, controls: { aphids: false, thrips: true, whiteflies: false, mites: false, lepidoptera: true, coleoptera: false } },
-    { activeIngredient: 'хлорантраніліпрол+тіаметоксам', productName: 'Воліам Флексі', category: 2, controls: { aphids: true, thrips: true, whiteflies: false, mites: false, lepidoptera: true, coleoptera: true } },
-    { activeIngredient: 'спіротетрамат', productName: 'Мовенто', category: 2, controls: { aphids: true, thrips: true, whiteflies: true, mites: true, lepidoptera: false, coleoptera: false } },
-    { activeIngredient: 'циантраніліпрол', productName: 'Ексірель', category: 2, controls: { aphids: true, thrips: true, whiteflies: true, mites: false, lepidoptera: true, coleoptera: false } },
-    { activeIngredient: 'циантраніліпрол+абамектин', productName: 'Лірум', category: 2, controls: { aphids: true, thrips: true, whiteflies: true, mites: true, lepidoptera: true, coleoptera: false } },
+    { activeIngredient: 'хлорантраніліпрол+лямбда-цигалотрин', productName: 'Ампліго', controls: { aphids: true, thrips: true, whiteflies: false, mites: false, lepidoptera: true, coleoptera: false } },
+    { activeIngredient: 'тіаметоксам+лямбда-цигалотрин', productName: 'Енжіо', controls: { aphids: true, thrips: false, whiteflies: false, mites: false, lepidoptera: true, coleoptera: true } },
+    { activeIngredient: 'Емамектину бензоат', productName: 'Проклейм', controls: { aphids: false, thrips: false, whiteflies: false, mites: false, lepidoptera: true, coleoptera: false } },
+    { activeIngredient: 'тіаметоксам', productName: 'Актара', controls: { aphids: true, thrips: false, whiteflies: true, mites: false, lepidoptera: false, coleoptera: true } },
+    { activeIngredient: 'абамектин', productName: 'Вертімек', controls: { aphids: false, thrips: true, whiteflies: false, mites: true, lepidoptera: false, coleoptera: false } },
+    { activeIngredient: 'лямбда-цигалотрин', productName: 'Карате Зеон', controls: { aphids: true, thrips: true, whiteflies: false, mites: false, lepidoptera: true, coleoptera: true } },
+    { activeIngredient: 'ацетаміприд', productName: 'Моспілан', controls: { aphids: true, thrips: true, whiteflies: false, mites: false, lepidoptera: false, coleoptera: true } },
+    { activeIngredient: 'хлорантраніліпрол', productName: 'Кораген', controls: { aphids: false, thrips: false, whiteflies: false, mites: false, lepidoptera: true, coleoptera: true } },
+    { activeIngredient: 'дельтаметрин', productName: 'Децис профі', controls: { aphids: true, thrips: true, whiteflies: false, mites: false, lepidoptera: true, coleoptera: true } },
+    { activeIngredient: 'флубендіамід', productName: 'Белт', controls: { aphids: false, thrips: false, whiteflies: false, mites: false, lepidoptera: true, coleoptera: false } },
+    { activeIngredient: 'спинеторам', productName: 'Радіант', controls: { aphids: false, thrips: true, whiteflies: false, mites: false, lepidoptera: true, coleoptera: false } },
+    { activeIngredient: 'люфенурон', productName: 'Матч', controls: { aphids: false, thrips: true, whiteflies: false, mites: false, lepidoptera: true, coleoptera: false } },
+    { activeIngredient: 'хлорантраніліпрол+тіаметоксам', productName: 'Воліам Флексі', controls: { aphids: true, thrips: true, whiteflies: false, mites: false, lepidoptera: true, coleoptera: true } },
+    { activeIngredient: 'спіротетрамат', productName: 'Мовенто', controls: { aphids: true, thrips: true, whiteflies: true, mites: true, lepidoptera: false, coleoptera: false } },
+    { activeIngredient: 'циантраніліпрол', productName: 'Ексірель', controls: { aphids: true, thrips: true, whiteflies: true, mites: false, lepidoptera: true, coleoptera: false } },
+    { activeIngredient: 'циантраніліпрол+абамектин', productName: 'Лірум', controls: { aphids: true, thrips: true, whiteflies: true, mites: true, lepidoptera: true, coleoptera: false } },
 ];
 
 const onionHerbicides: Herbicide[] = [
@@ -606,15 +606,15 @@ const onionFungicides: Fungicide[] = [
 ];
 
 const onionInsecticides: Insecticide[] = [
-    { activeIngredient: 'тіаметоксам', productName: 'Актара', category: 2, controls: { aphids: true, thrips: true, whiteflies: true, mites: false, lepidoptera: false, coleoptera: true } },
-    { activeIngredient: 'лямбда-цигалотрин', productName: 'Карате Зеон', category: 2, controls: { aphids: true, thrips: true, whiteflies: false, mites: false, lepidoptera: true, coleoptera: true } },
-    { activeIngredient: 'спінеторам', productName: 'Радіант', category: 2, controls: { aphids: false, thrips: true, whiteflies: false, mites: false, lepidoptera: true, coleoptera: false } },
-    { activeIngredient: 'абамектин', productName: 'Вертімек', category: 2, controls: { aphids: false, thrips: true, whiteflies: false, mites: true, lepidoptera: false, coleoptera: false } },
-    { activeIngredient: 'хлорантраніліпрол', productName: 'Кораген', category: 2, controls: { aphids: false, thrips: false, whiteflies: false, mites: false, lepidoptera: true, coleoptera: false } },
-    { activeIngredient: 'ацетаміприд', productName: 'Моспілан', category: 2, controls: { aphids: true, thrips: true, whiteflies: true, mites: false, lepidoptera: false, coleoptera: true } },
-    { activeIngredient: 'спіротетрамат', productName: 'Мовенто', category: 2, controls: { aphids: true, thrips: true, whiteflies: true, mites: true, lepidoptera: false, coleoptera: false } },
-    { activeIngredient: 'циантраніліпрол', productName: 'Ексірель', category: 2, controls: { aphids: true, thrips: true, whiteflies: true, mites: false, lepidoptera: true, coleoptera: true } },
-    { activeIngredient: 'дельтаметрин', productName: 'Децис профі', category: 2, controls: { aphids: true, thrips: true, whiteflies: false, mites: false, lepidoptera: true, coleoptera: true } },
+    { activeIngredient: 'тіаметоксам', productName: 'Актара', controls: { aphids: true, thrips: true, whiteflies: true, mites: false, lepidoptera: false, coleoptera: true } },
+    { activeIngredient: 'лямбда-цигалотрин', productName: 'Карате Зеон', controls: { aphids: true, thrips: true, whiteflies: false, mites: false, lepidoptera: true, coleoptera: true } },
+    { activeIngredient: 'спінеторам', productName: 'Радіант', controls: { aphids: false, thrips: true, whiteflies: false, mites: false, lepidoptera: true, coleoptera: false } },
+    { activeIngredient: 'абамектин', productName: 'Вертімек', controls: { aphids: false, thrips: true, whiteflies: false, mites: true, lepidoptera: false, coleoptera: false } },
+    { activeIngredient: 'хлорантраніліпрол', productName: 'Кораген', controls: { aphids: false, thrips: false, whiteflies: false, mites: false, lepidoptera: true, coleoptera: false } },
+    { activeIngredient: 'ацетаміприд', productName: 'Моспілан', controls: { aphids: true, thrips: true, whiteflies: true, mites: false, lepidoptera: false, coleoptera: true } },
+    { activeIngredient: 'спіротетрамат', productName: 'Мовенто', controls: { aphids: true, thrips: true, whiteflies: true, mites: true, lepidoptera: false, coleoptera: false } },
+    { activeIngredient: 'циантраніліпрол', productName: 'Ексірель', controls: { aphids: true, thrips: true, whiteflies: true, mites: false, lepidoptera: true, coleoptera: true } },
+    { activeIngredient: 'дельтаметрин', productName: 'Децис профі', controls: { aphids: true, thrips: true, whiteflies: false, mites: false, lepidoptera: true, coleoptera: true } },
 ];
 
 const carrotHerbicides: Herbicide[] = [
@@ -770,13 +770,13 @@ const carrotFungicides: Fungicide[] = [
 ];
 
 const carrotInsecticides: Insecticide[] = [
-    { activeIngredient: 'дельтаметрин', productName: 'Децис профі', category: 2, controls: { aphids: true, thrips: false, whiteflies: false, mites: false, lepidoptera: true, coleoptera: true } },
-    { activeIngredient: 'тіаметоксам', productName: 'Актара', category: 2, controls: { aphids: true, thrips: false, whiteflies: false, mites: false, lepidoptera: false, coleoptera: true } },
-    { activeIngredient: 'лямбда-цигалотрин', productName: 'Карате Зеон', category: 2, controls: { aphids: true, thrips: true, whiteflies: false, mites: false, lepidoptera: true, coleoptera: true } },
-    { activeIngredient: 'ацетаміприд', productName: 'Моспілан', category: 2, controls: { aphids: true, thrips: true, whiteflies: true, mites: false, lepidoptera: false, coleoptera: true } },
-    { activeIngredient: 'спіротетрамат', productName: 'Мовенто', category: 2, controls: { aphids: true, thrips: true, whiteflies: true, mites: true, lepidoptera: false, coleoptera: false } },
-    { activeIngredient: 'флупірадифурон', productName: 'Сіванто Прайм', category: 2, controls: { aphids: true, thrips: true, whiteflies: true, mites: false, lepidoptera: false, coleoptera: false } },
-    { activeIngredient: 'флонікамід', productName: 'Теппекі', category: 2, controls: { aphids: true, thrips: true, whiteflies: false, mites: false, lepidoptera: false, coleoptera: false } },
+    { activeIngredient: 'дельтаметрин', productName: 'Децис профі', controls: { aphids: true, thrips: false, whiteflies: false, mites: false, lepidoptera: true, coleoptera: true } },
+    { activeIngredient: 'тіаметоксам', productName: 'Актара', controls: { aphids: true, thrips: false, whiteflies: false, mites: false, lepidoptera: false, coleoptera: true } },
+    { activeIngredient: 'лямбда-цигалотрин', productName: 'Карате Зеон', controls: { aphids: true, thrips: true, whiteflies: false, mites: false, lepidoptera: true, coleoptera: true } },
+    { activeIngredient: 'ацетаміприд', productName: 'Моспілан', controls: { aphids: true, thrips: true, whiteflies: true, mites: false, lepidoptera: false, coleoptera: true } },
+    { activeIngredient: 'спіротетрамат', productName: 'Мовенто', controls: { aphids: true, thrips: true, whiteflies: true, mites: true, lepidoptera: false, coleoptera: false } },
+    { activeIngredient: 'флупірадифурон', productName: 'Сіванто Прайм', controls: { aphids: true, thrips: true, whiteflies: true, mites: false, lepidoptera: false, coleoptera: false } },
+    { activeIngredient: 'флонікамід', productName: 'Теппекі', controls: { aphids: true, thrips: true, whiteflies: false, mites: false, lepidoptera: false, coleoptera: false } },
 ];
 
 const pumpkinFungicides: Fungicide[] = [
@@ -867,13 +867,13 @@ const pumpkinHerbicides: Herbicide[] = [
 ];
 
 const pumpkinInsecticides: Insecticide[] = [
-    { activeIngredient: 'тіаметоксам', productName: 'Актара', category: 2, controls: { aphids: true, thrips: true, whiteflies: true, mites: false, lepidoptera: false, coleoptera: true } },
-    { activeIngredient: 'лямбда-цигалотрин + тіаметоксам', productName: 'Енжіо', category: 2, controls: { aphids: true, thrips: true, whiteflies: false, mites: false, lepidoptera: true, coleoptera: true } },
-    { activeIngredient: 'абамектин', productName: 'Вертімек', category: 2, controls: { aphids: false, thrips: true, whiteflies: false, mites: true, lepidoptera: false, coleoptera: false } },
-    { activeIngredient: 'ацетаміприд', productName: 'Моспілан', category: 2, controls: { aphids: true, thrips: true, whiteflies: true, mites: false, lepidoptera: false, coleoptera: true } },
-    { activeIngredient: 'хлорантраніліпрол', productName: 'Кораген', category: 2, controls: { aphids: false, thrips: false, whiteflies: false, mites: false, lepidoptera: true, coleoptera: true } },
-    { activeIngredient: 'спіротетрамат', productName: 'Мовенто', category: 2, controls: { aphids: true, thrips: true, whiteflies: true, mites: true, lepidoptera: false, coleoptera: false } },
-    { activeIngredient: 'дельтаметрин', productName: 'Децис профі', category: 2, controls: { aphids: true, thrips: true, whiteflies: false, mites: false, lepidoptera: true, coleoptera: true } },
+    { activeIngredient: 'тіаметоксам', productName: 'Актара', controls: { aphids: true, thrips: true, whiteflies: true, mites: false, lepidoptera: false, coleoptera: true } },
+    { activeIngredient: 'лямбда-цигалотрин + тіаметоксам', productName: 'Енжіо', controls: { aphids: true, thrips: true, whiteflies: false, mites: false, lepidoptera: true, coleoptera: true } },
+    { activeIngredient: 'абамектин', productName: 'Вертімек', controls: { aphids: false, thrips: true, whiteflies: false, mites: true, lepidoptera: false, coleoptera: false } },
+    { activeIngredient: 'ацетаміприд', productName: 'Моспілан', controls: { aphids: true, thrips: true, whiteflies: true, mites: false, lepidoptera: false, coleoptera: true } },
+    { activeIngredient: 'хлорантраніліпрол', productName: 'Кораген', controls: { aphids: false, thrips: false, whiteflies: false, mites: false, lepidoptera: true, coleoptera: true } },
+    { activeIngredient: 'спіротетрамат', productName: 'Мовенто', controls: { aphids: true, thrips: true, whiteflies: true, mites: true, lepidoptera: false, coleoptera: false } },
+    { activeIngredient: 'дельтаметрин', productName: 'Децис профі', controls: { aphids: true, thrips: true, whiteflies: false, mites: false, lepidoptera: true, coleoptera: true } },
 ];
 
 const eggplantHerbicides: Herbicide[] = [
@@ -945,15 +945,15 @@ const eggplantFungicides: Fungicide[] = [
 ];
 
 const eggplantInsecticides: Insecticide[] = [
-    { activeIngredient: 'імідаклоприд', productName: 'Конфідор', category: 2, controls: { aphids: true, thrips: false, whiteflies: true, mites: false, lepidoptera: false, coleoptera: true } },
-    { activeIngredient: 'тіаметоксам', productName: 'Актара', category: 2, controls: { aphids: true, thrips: true, whiteflies: true, mites: false, lepidoptera: false, coleoptera: true } },
-    { activeIngredient: 'ацетаміприд', productName: 'Моспілан', category: 2, controls: { aphids: true, thrips: true, whiteflies: true, mites: false, lepidoptera: false, coleoptera: true } },
-    { activeIngredient: 'хлорантраніліпрол', productName: 'Кораген', category: 2, controls: { aphids: false, thrips: false, whiteflies: false, mites: false, lepidoptera: true, coleoptera: true } },
-    { activeIngredient: 'абамектин', productName: 'Вертімек', category: 2, controls: { aphids: false, thrips: true, whiteflies: false, mites: true, lepidoptera: false, coleoptera: false } },
-    { activeIngredient: 'спінеторам', productName: 'Радіант', category: 2, controls: { aphids: false, thrips: true, whiteflies: false, mites: false, lepidoptera: true, coleoptera: false } },
-    { activeIngredient: 'Емамектину бензоат', productName: 'Проклейм', category: 2, controls: { aphids: false, thrips: true, whiteflies: false, mites: false, lepidoptera: true, coleoptera: false } },
-    { activeIngredient: 'спіротетрамат', productName: 'Мовенто', category: 2, controls: { aphids: true, thrips: true, whiteflies: true, mites: true, lepidoptera: false, coleoptera: false } },
-    { activeIngredient: 'лямбда-цигалотрин', productName: 'Карате Зеон', category: 2, controls: { aphids: true, thrips: true, whiteflies: false, mites: false, lepidoptera: true, coleoptera: true } },
+    { activeIngredient: 'імідаклоприд', productName: 'Конфідор', controls: { aphids: true, thrips: false, whiteflies: true, mites: false, lepidoptera: false, coleoptera: true } },
+    { activeIngredient: 'тіаметоксам', productName: 'Актара', controls: { aphids: true, thrips: true, whiteflies: true, mites: false, lepidoptera: false, coleoptera: true } },
+    { activeIngredient: 'ацетаміприд', productName: 'Моспілан', controls: { aphids: true, thrips: true, whiteflies: true, mites: false, lepidoptera: false, coleoptera: true } },
+    { activeIngredient: 'хлорантраніліпрол', productName: 'Кораген', controls: { aphids: false, thrips: false, whiteflies: false, mites: false, lepidoptera: true, coleoptera: true } },
+    { activeIngredient: 'абамектин', productName: 'Вертімек', controls: { aphids: false, thrips: true, whiteflies: false, mites: true, lepidoptera: false, coleoptera: false } },
+    { activeIngredient: 'спінеторам', productName: 'Радіант', controls: { aphids: false, thrips: true, whiteflies: false, mites: false, lepidoptera: true, coleoptera: false } },
+    { activeIngredient: 'Емамектину бензоат', productName: 'Проклейм', controls: { aphids: false, thrips: true, whiteflies: false, mites: false, lepidoptera: true, coleoptera: false } },
+    { activeIngredient: 'спіротетрамат', productName: 'Мовенто', controls: { aphids: true, thrips: true, whiteflies: true, mites: true, lepidoptera: false, coleoptera: false } },
+    { activeIngredient: 'лямбда-цигалотрин', productName: 'Карате Зеон', controls: { aphids: true, thrips: true, whiteflies: false, mites: false, lepidoptera: true, coleoptera: true } },
 ];
 
 const beetHerbicides: Herbicide[] = [
@@ -1084,12 +1084,12 @@ const beetFungicides: Fungicide[] = [
 ];
 
 const beetInsecticides: Insecticide[] = [
-    { activeIngredient: 'тіаметоксам', productName: 'Актара', category: 2, controls: { aphids: true, thrips: false, whiteflies: false, mites: false, lepidoptera: false, coleoptera: true } },
-    { activeIngredient: 'імідаклоприд', productName: 'Конфідор', category: 2, controls: { aphids: true, thrips: false, whiteflies: false, mites: false, lepidoptera: false, coleoptera: true } },
-    { activeIngredient: 'лямбда-цигалотрин', productName: 'Карате Зеон', category: 2, controls: { aphids: true, thrips: false, whiteflies: false, mites: false, lepidoptera: true, coleoptera: true } },
-    { activeIngredient: 'ацетаміприд', productName: 'Моспілан', category: 2, controls: { aphids: true, thrips: false, whiteflies: false, mites: false, lepidoptera: false, coleoptera: true } },
-    { activeIngredient: 'флонікамід', productName: 'Теппекі', category: 2, controls: { aphids: true, thrips: true, whiteflies: false, mites: false, lepidoptera: false, coleoptera: false } },
-    { activeIngredient: 'дельтаметрин', productName: 'Децис', category: 2, controls: { aphids: true, thrips: false, whiteflies: false, mites: false, lepidoptera: true, coleoptera: true } },
+    { activeIngredient: 'тіаметоксам', productName: 'Актара', controls: { aphids: true, thrips: false, whiteflies: false, mites: false, lepidoptera: false, coleoptera: true } },
+    { activeIngredient: 'імідаклоприд', productName: 'Конфідор', controls: { aphids: true, thrips: false, whiteflies: false, mites: false, lepidoptera: false, coleoptera: true } },
+    { activeIngredient: 'лямбда-цигалотрин', productName: 'Карате Зеон', controls: { aphids: true, thrips: false, whiteflies: false, mites: false, lepidoptera: true, coleoptera: true } },
+    { activeIngredient: 'ацетаміприд', productName: 'Моспілан', controls: { aphids: true, thrips: false, whiteflies: false, mites: false, lepidoptera: false, coleoptera: true } },
+    { activeIngredient: 'флонікамід', productName: 'Теппекі', controls: { aphids: true, thrips: true, whiteflies: false, mites: false, lepidoptera: false, coleoptera: false } },
+    { activeIngredient: 'дельтаметрин', productName: 'Децис', controls: { aphids: true, thrips: false, whiteflies: false, mites: false, lepidoptera: true, coleoptera: true } },
 ];
 
 const celeryHerbicides: Herbicide[] = [
@@ -1213,12 +1213,12 @@ const celeryFungicides: Fungicide[] = [
 ];
 
 const celeryInsecticides: Insecticide[] = [
-    { activeIngredient: 'тіаметоксам', productName: 'Актара', category: 2, controls: { aphids: true, thrips: false, whiteflies: false, mites: false, lepidoptera: false, coleoptera: true } },
-    { activeIngredient: 'лямбда-цигалотрин', productName: 'Карате Зеон', category: 2, controls: { aphids: true, thrips: true, whiteflies: false, mites: false, lepidoptera: true, coleoptera: true } },
-    { activeIngredient: 'абамектин', productName: 'Вертімек', category: 2, controls: { aphids: false, thrips: true, whiteflies: false, mites: true, lepidoptera: false, coleoptera: false } },
-    { activeIngredient: 'флупірадифурон', productName: 'Сіванто Прайм', category: 2, controls: { aphids: true, thrips: true, whiteflies: true, mites: false, lepidoptera: false, coleoptera: false } },
-    { activeIngredient: 'спіротетрамат', productName: 'Мовенто', category: 2, controls: { aphids: true, thrips: true, whiteflies: true, mites: true, lepidoptera: false, coleoptera: false } },
-    { activeIngredient: 'ацетаміприд', productName: 'Моспілан', category: 2, controls: { aphids: true, thrips: true, whiteflies: false, mites: false, lepidoptera: false, coleoptera: true } },
+    { activeIngredient: 'тіаметоксам', productName: 'Актара', controls: { aphids: true, thrips: false, whiteflies: false, mites: false, lepidoptera: false, coleoptera: true } },
+    { activeIngredient: 'лямбда-цигалотрин', productName: 'Карате Зеон', controls: { aphids: true, thrips: true, whiteflies: false, mites: false, lepidoptera: true, coleoptera: true } },
+    { activeIngredient: 'абамектин', productName: 'Вертімек', controls: { aphids: false, thrips: true, whiteflies: false, mites: true, lepidoptera: false, coleoptera: false } },
+    { activeIngredient: 'флупірадифурон', productName: 'Сіванто Прайм', controls: { aphids: true, thrips: true, whiteflies: true, mites: false, lepidoptera: false, coleoptera: false } },
+    { activeIngredient: 'спіротетрамат', productName: 'Мовенто', controls: { aphids: true, thrips: true, whiteflies: true, mites: true, lepidoptera: false, coleoptera: false } },
+    { activeIngredient: 'ацетаміприд', productName: 'Моспілан', controls: { aphids: true, thrips: true, whiteflies: false, mites: false, lepidoptera: false, coleoptera: true } },
 ];
 
 
