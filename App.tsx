@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ProblemType, CropType, Fungicide, Insecticide, PlotType } from './types';
+import { ProblemType, CropType, Fungicide, Insecticide, PlotType, IdentificationResult } from './types';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import CropSelector from './components/CropSelector';
@@ -10,6 +10,8 @@ import LandingPage from './components/LandingPage';
 import PlotTypeSelector from './components/PlotTypeSelector';
 import IntegratedSystemModal from './components/IntegratedSystemModal';
 import { cropData } from './data';
+import BackButton from './components/BackButton';
+import StandaloneIdentifierPage from './components/StandaloneIdentifierPage';
 
 type Product = Fungicide | Insecticide;
 
@@ -19,7 +21,7 @@ const topProducts = {
 };
 
 const App: React.FC = () => {
-  const [view, setView] = useState<'landing' | 'plotTypeSelection' | 'builder'>('landing');
+  const [view, setView] = useState<'landing' | 'plotTypeSelection' | 'builder' | 'identifier'>('landing');
   const [currentStep, setCurrentStep] = useState(1);
   const [selectedCrop, setSelectedCrop] = useState<CropType | null>(null);
   const [selectedProblem, setSelectedProblem] = useState<ProblemType | null>(null);
@@ -46,6 +48,10 @@ const App: React.FC = () => {
   const handleSelectPlotType = (type: PlotType) => {
     setPlotType(type);
     setView('builder');
+    // If we came from the identifier, jump to results
+    if (selectedCrop && selectedProblem) {
+        setCurrentStep(3);
+    }
   }
 
   const goToStep = (step: number) => {
@@ -71,13 +77,29 @@ const App: React.FC = () => {
   
   const startBuilder = () => {
     resetBuilder();
-    setView('plotTypeSelection');
   }
 
   const goToLanding = () => {
       setView('landing');
-      resetBuilder();
+      setCurrentStep(1);
+      setSelectedCrop(null);
+      setSelectedProblem(null);
+      setIntegratedSystemPlan(null);
+      setPlotType(null);
   }
+
+  const goToIdentifier = () => {
+      setView('identifier');
+  }
+
+  const handleIdentificationComplete = (result: IdentificationResult) => {
+      if (result.crop !== 'unknown' && (result.type === 'disease' || result.type === 'pest')) {
+          setSelectedCrop(result.crop);
+          const problem = result.type === 'disease' ? ProblemType.Diseases : ProblemType.Pests;
+          setSelectedProblem(problem);
+          setView('plotTypeSelection');
+      }
+  };
   
   const generatePlan = (crop: CropType, period: number) => {
     if (!plotType) return [];
@@ -187,6 +209,7 @@ const App: React.FC = () => {
         const addProduct = (product: Product): boolean => {
             if (treatmentProducts.length >= 4) return false;
             treatmentProducts.push(product);
+            // FIX: Use the 'product' parameter instead of the out-of-scope variable 'p'.
             const key = `${product.productName}|${product.activeIngredient}`;
             usageCount.set(key, (usageCount.get(key) ?? 0) + 1);
             updateTargets(product);
@@ -313,115 +336,149 @@ const App: React.FC = () => {
     return plan;
   };
 
+  const handleGenerateSystem = (period: number) => {
+    if (selectedCrop) {
+        const plan = generatePlan(selectedCrop, period);
+        setIntegratedSystemPlan(plan);
+        setCurrentStep(3);
+    }
+    setIsIntegratedModalOpen(false);
+  }
 
-  const handleGenerateSystem = (growingPeriod: number) => {
-      if (!selectedCrop) return;
-      const plan = generatePlan(selectedCrop, growingPeriod);
-      setIntegratedSystemPlan(plan);
-      setIsIntegratedModalOpen(false);
-      setCurrentStep(3);
-  };
-
-
-  const cropNameMap = {
-    [CropType.Tomato]: 'томатів',
-    [CropType.Pepper]: 'перцю',
-    [CropType.Cabbage]: 'капусти',
-    [CropType.Onion]: 'цибулі',
-    [CropType.Carrot]: 'моркви',
-    [CropType.Pumpkin]: 'гарбузових',
-    [CropType.Eggplant]: 'баклажанів',
-    [CropType.Beet]: 'буряків',
-    [CropType.Celery]: 'селери',
-  };
-
-  const problemNameMap = {
-    [ProblemType.Weeds]: "Бур'яни",
-    [ProblemType.Diseases]: "Хвороби",
-    [ProblemType.Pests]: "Шкідники",
-    [ProblemType.Integrated]: "Інтегрована система захисту",
-  };
-
-  const steps = [
-    { number: 1, title: 'Вибір культури' },
-    { number: 2, title: 'Вибір проблеми' },
-    { number: 3, title: 'Результати' },
-  ];
-
-  const renderStepContent = () => {
-    switch (currentStep) {
-      case 1:
-        return (
-          <>
-            <h2 className="text-2xl md:text-3xl font-bold text-gray-800 mb-6">Крок 1: Оберіть культуру</h2>
-            <CropSelector selectedCrop={selectedCrop} onSelectCrop={handleSelectCrop} />
-          </>
-        );
-      case 2:
-        return (
-          <>
-            <h2 className="text-2xl md:text-3xl font-bold text-gray-800 mb-6">Крок 2: Оберіть проблему для {selectedCrop && cropNameMap[selectedCrop]}</h2>
-            {selectedCrop && plotType && <ProblemSelector selectedCrop={selectedCrop} plotType={plotType} selectedProblem={selectedProblem} onSelectProblem={handleSelectProblem} />}
-          </>
-        );
-      case 3:
-        return (
-          <>
-            <h2 className="text-2xl md:text-3xl font-bold text-gray-800 mb-2">Результати</h2>
-            {selectedCrop && selectedProblem && <p className="text-gray-600 mb-6">Рекомендації для <strong>{selectedCrop && cropNameMap[selectedCrop]}</strong> по проблемі: <strong>{problemNameMap[selectedProblem]}</strong></p>}
-            {selectedProblem && selectedCrop && plotType && <ResultsDisplay problemType={selectedProblem} cropType={selectedCrop} plotType={plotType} integratedSystemPlan={integratedSystemPlan} />}
-            <button
-              onClick={resetBuilder}
-              className="mt-8 bg-green-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-green-700 transition-colors shadow-lg"
-            >
-              Спробувати ще раз
-            </button>
-          </>
-        );
-      default:
-        return null;
+  const handleBack = () => {
+    if (view === 'builder') {
+      if (currentStep === 3) {
+        // From Results to Problem Selection
+        setCurrentStep(2);
+        setSelectedProblem(null);
+        setIntegratedSystemPlan(null);
+      } else if (currentStep === 2) {
+        // From Problem Selection to Crop Selection
+        setCurrentStep(1);
+        setSelectedCrop(null);
+        setSelectedProblem(null);
+      } else if (currentStep === 1) {
+        // From Crop Selection to Plot Type Selection
+        setView('plotTypeSelection');
+        setPlotType(null);
+        setSelectedCrop(null);
+      }
+    } else if (view === 'plotTypeSelection') {
+      // From Plot Type Selection to Landing page
+      goToLanding();
+    } else if (view === 'identifier') {
+      // From Identifier to Landing page
+      goToLanding();
     }
   };
-
-  if (view === 'landing') {
-      return (
-          <div className="min-h-screen flex flex-col">
-              <Header onHomeClick={goToLanding} onStartBuilder={startBuilder} />
-              <main className="flex-grow">
-                  <LandingPage />
-              </main>
-              <Footer />
-          </div>
-      );
-  }
   
-  if (view === 'plotTypeSelection') {
-      return (
-        <div className="min-h-screen flex flex-col">
-          <Header onHomeClick={goToLanding} onStartBuilder={startBuilder} />
-           <main className="flex-grow container mx-auto px-4 py-8">
-              <PlotTypeSelector onSelectPlotType={handleSelectPlotType} />
-           </main>
-          <Footer />
-        </div>
-      );
-  }
+    const cropNameMap: Record<CropType, string> = {
+        [CropType.Tomato]: 'Томат',
+        [CropType.Pepper]: 'Перець',
+        [CropType.Cabbage]: 'Капуста',
+        [CropType.Onion]: 'Цибуля',
+        [CropType.Carrot]: 'Морква',
+        [CropType.Pumpkin]: 'Гарбузові',
+        [CropType.Eggplant]: 'Баклажан',
+        [CropType.Beet]: 'Буряк',
+        [CropType.Celery]: 'Селера',
+    };
+    
+    const cropNameMapGenitive: Record<CropType, string> = {
+        [CropType.Tomato]: 'томатів',
+        [CropType.Pepper]: 'перцю',
+        [CropType.Cabbage]: 'капусти',
+        [CropType.Onion]: 'цибулі',
+        [CropType.Carrot]: 'моркви',
+        [CropType.Pumpkin]: 'гарбузових',
+        [CropType.Eggplant]: 'баклажанів',
+        [CropType.Beet]: 'буряків',
+        [CropType.Celery]: 'селери',
+    };
+    
+    const problemNameMap: Record<ProblemType, string> = {
+        [ProblemType.Weeds]: "Бур'яни",
+        [ProblemType.Diseases]: "Хвороби",
+        [ProblemType.Pests]: "Шкідники",
+        [ProblemType.Integrated]: "Інтегрована система захисту",
+    };
 
-  return (
-    <div className="min-h-screen flex flex-col">
-      <Header onHomeClick={goToLanding} onStartBuilder={startBuilder} />
-      <main className="flex-grow container mx-auto px-4 py-8">
-        <Stepper steps={steps} currentStep={currentStep} goToStep={goToStep} />
-        <div className="bg-white p-6 sm:p-8 rounded-xl shadow-lg animate-fade-in">
-            {renderStepContent()}
+  const mainContent = () => {
+    if (view === 'landing') {
+      return <LandingPage />;
+    }
+    
+    if (view === 'identifier') {
+        return <StandaloneIdentifierPage cropNameMap={cropNameMap} onIdentificationComplete={handleIdentificationComplete} onBackToLanding={goToLanding} />;
+    }
+
+    if (view === 'plotTypeSelection') {
+        return (
+            <div className="container mx-auto px-4 py-8">
+                <BackButton onClick={handleBack} />
+                <PlotTypeSelector onSelectPlotType={handleSelectPlotType} />
+            </div>
+        );
+    }
+    
+    // view === 'builder'
+    const steps = [
+        { number: 1, title: 'Вибір культури' },
+        { number: 2, title: 'Вибір проблеми' },
+        { number: 3, title: 'Результат' },
+    ];
+    
+    return (
+        <div className="container mx-auto px-4 py-8">
+            <BackButton onClick={handleBack} />
+            <Stepper steps={steps} currentStep={currentStep} goToStep={goToStep} />
+            <div className="bg-white p-6 sm:p-8 rounded-xl shadow-lg mt-8">
+              {currentStep === 1 && (
+                  <>
+                    <h2 className="text-2xl md:text-3xl font-bold text-gray-800 mb-6">Крок 1: Оберіть культуру</h2>
+                    <CropSelector selectedCrop={selectedCrop} onSelectCrop={handleSelectCrop} />
+                  </>
+              )}
+              {currentStep === 2 && selectedCrop && plotType && (
+                  <>
+                    <h2 className="text-2xl md:text-3xl font-bold text-gray-800 mb-6">Крок 2: Оберіть проблему для {cropNameMapGenitive[selectedCrop]}</h2>
+                    <ProblemSelector selectedCrop={selectedCrop} plotType={plotType} selectedProblem={selectedProblem} onSelectProblem={handleSelectProblem} />
+                  </>
+              )}
+              {currentStep === 3 && selectedCrop && selectedProblem && plotType && (
+                  <>
+                    <h2 className="text-2xl md:text-3xl font-bold text-gray-800 mb-2">Результати</h2>
+                    <p className="text-gray-600 mb-6">
+                        Рекомендації для <strong>{cropNameMapGenitive[selectedCrop]}</strong> по проблемі: <strong>{problemNameMap[selectedProblem]}</strong>
+                    </p>
+                    <ResultsDisplay problemType={selectedProblem} cropType={selectedCrop} plotType={plotType} integratedSystemPlan={integratedSystemPlan} />
+                    <div className="mt-8 text-center border-t pt-6">
+                        <button
+                            onClick={handleBack}
+                            className="inline-flex items-center bg-gray-200 text-gray-800 font-bold py-3 px-6 rounded-lg hover:bg-gray-300 transition-colors shadow-sm"
+                            aria-label="Повернутись до вибору проблеми"
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                            </svg>
+                            <span>Повернутись до вибору проблеми</span>
+                        </button>
+                    </div>
+                  </>
+              )}
+            </div>
         </div>
+    );
+  };
+  
+  return (
+    <div className="min-h-screen flex flex-col bg-gray-50">
+      <Header onHomeClick={goToLanding} onStartBuilder={startBuilder} onGoToIdentifier={goToIdentifier} />
+      <main className="flex-grow">
+          {mainContent()}
       </main>
-      <IntegratedSystemModal 
-        isOpen={isIntegratedModalOpen} 
-        onClose={() => setIsIntegratedModalOpen(false)}
-        onSubmit={handleGenerateSystem}
-      />
       <Footer />
+      <IntegratedSystemModal isOpen={isIntegratedModalOpen} onClose={() => setIsIntegratedModalOpen(false)} onSubmit={handleGenerateSystem} />
     </div>
   );
 };

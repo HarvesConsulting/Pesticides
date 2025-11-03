@@ -1,0 +1,182 @@
+import React, { useState, useRef } from 'react';
+import { GoogleGenAI, Type } from "@google/genai";
+import { CropType, IdentificationResult } from '../types';
+import { CameraIcon } from './icons/CameraIcon';
+import { UploadIcon } from './icons/UploadIcon';
+
+interface ProblemIdentifierProps {
+  cropNameMap: Record<CropType, string>;
+  onBackToLanding: () => void;
+  onIdentificationComplete: (result: IdentificationResult) => void;
+}
+
+const blobToBase64 = (blob: Blob): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      if (typeof reader.result === 'string') {
+        resolve(reader.result.split(',')[1]);
+      } else {
+        reject(new Error("Failed to read blob as base64 string"));
+      }
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(blob);
+  });
+};
+
+const ProblemIdentifier: React.FC<ProblemIdentifierProps> = ({ cropNameMap, onBackToLanding, onIdentificationComplete }) => {
+  const [imageSrc, setImageSrc] = useState<string | null>(null);
+  const [imageBlob, setImageBlob] = useState<Blob | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [result, setResult] = useState<IdentificationResult | null>(null);
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const cameraInputRef = useRef<HTMLInputElement>(null);
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setImageSrc(e.target?.result as string);
+        setImageBlob(file);
+        setResult(null);
+        setError(null);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleIdentify = async () => {
+    if (!imageBlob) return;
+    setIsLoading(true);
+    setError(null);
+    setResult(null);
+
+    try {
+      const base64Data = await blobToBase64(imageBlob);
+      const ai = new GoogleGenAI({ apiKey: process.env.API_KEY as string });
+
+      const cropList = Object.values(CropType).join(', ');
+      const promptText = `Ідентифікуй культуру, а також хворобу або шкідника на цьому фото. Надай відповідь у форматі JSON.
+Для поля 'crop' використовуй одне з цих значень: [${cropList}]. Якщо не можеш визначити культуру з цього списку, встанови 'unknown'.
+Для поля 'type' використовуй одне з цих значень: 'disease', 'pest', або 'unknown'.
+JSON об'єкт повинен мати такі поля: 'crop' (назва культури англійською), 'name' (назва проблеми українською), 'type' (тип проблеми), 'description' (короткий опис проблеми), 'confidence' (число від 0 до 100, що відображає загальну впевненість).`;
+
+      const response = await ai.models.generateContent({
+        model: 'gemini-2.5-flash',
+        contents: {
+          parts: [
+            {
+              inlineData: {
+                mimeType: imageBlob.type,
+                data: base64Data,
+              },
+            },
+            { text: promptText },
+          ],
+        },
+        config: {
+          responseMimeType: "application/json",
+          responseSchema: {
+            type: Type.OBJECT,
+            properties: {
+                crop: { type: Type.STRING },
+                name: { type: Type.STRING },
+                type: { type: Type.STRING },
+                description: { type: Type.STRING },
+                confidence: { type: Type.NUMBER },
+            },
+            required: ['crop', 'name', 'type', 'description', 'confidence'],
+          },
+        },
+      });
+      
+      const jsonText = response.text.trim();
+      const parsedResult: IdentificationResult = JSON.parse(jsonText);
+      setResult(parsedResult);
+
+    } catch (err) {
+      console.error(err);
+      setError('Не вдалося розпізнати проблему. Спробуйте інше фото або перевірте з\'єднання.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  
+  const reset = () => {
+    setImageSrc(null);
+    setImageBlob(null);
+    setResult(null);
+    setError(null);
+  }
+
+  return (
+    <div className="bg-white p-6 sm:p-8 rounded-xl shadow-lg animate-fade-in">
+      <h2 className="text-2xl md:text-3xl font-bold text-gray-800 mb-6 text-center">Визначити проблему за фото</h2>
+      
+      {!imageSrc && (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+            <input type="file" accept="image/*" ref={cameraInputRef} onChange={handleFileChange} capture="environment" className="hidden" />
+            <button onClick={() => cameraInputRef.current?.click()} className="p-8 rounded-lg border-2 border-dashed border-gray-300 hover:border-green-500 hover:bg-green-50 transition-colors flex flex-col items-center justify-center">
+                <CameraIcon className="w-12 h-12 text-gray-500 mb-2" />
+                <span className="font-semibold text-gray-700">Зробити фото</span>
+            </button>
+            <input type="file" accept="image/*" ref={fileInputRef} onChange={handleFileChange} className="hidden" />
+            <button onClick={() => fileInputRef.current?.click()} className="p-8 rounded-lg border-2 border-dashed border-gray-300 hover:border-blue-500 hover:bg-blue-50 transition-colors flex flex-col items-center justify-center">
+                <UploadIcon className="w-12 h-12 text-gray-500 mb-2" />
+                <span className="font-semibold text-gray-700">Завантажити з галереї</span>
+            </button>
+        </div>
+      )}
+
+      {imageSrc && (
+        <div className="space-y-6">
+            <div className="w-full max-w-sm mx-auto">
+                <img src={imageSrc} alt="Preview" className="rounded-lg shadow-md w-full h-auto" />
+            </div>
+            {!result && (
+                <div className="flex justify-center">
+                    <button onClick={handleIdentify} disabled={isLoading} className="bg-green-600 text-white font-bold py-3 px-8 rounded-lg hover:bg-green-700 transition-colors shadow-lg disabled:bg-gray-400 disabled:cursor-wait">
+                        {isLoading ? 'Аналіз...' : 'Аналізувати'}
+                    </button>
+                     <button onClick={reset} className="ml-4 bg-gray-200 text-gray-700 font-bold py-3 px-8 rounded-lg hover:bg-gray-300 transition-colors">
+                        Обрати інше
+                    </button>
+                </div>
+            )}
+        </div>
+      )}
+      
+      {isLoading && <div className="text-center py-4">Обробка зображення, зачекайте...</div>}
+      {error && <div className="text-center py-4 text-red-600 bg-red-50 p-3 rounded-lg">{error}</div>}
+
+      {result && (
+        <div className="mt-8 border-t pt-6 text-center animate-fade-in">
+          <h3 className="text-2xl font-bold text-gray-800">Ідентифіковано: {result.name}</h3>
+          <p className="text-lg text-gray-600 mb-1">
+              Культура: <strong>{result.crop !== 'unknown' && cropNameMap[result.crop] ? cropNameMap[result.crop].replace(/ів$/, '') : 'Невизначено'}</strong>
+          </p>
+          <p className="text-sm text-gray-500 mb-4">(Впевненість: {result.confidence.toFixed(1)}%)</p>
+          <p className="text-gray-600 mb-6 max-w-xl mx-auto">{result.description}</p>
+
+          {result.crop !== 'unknown' && (result.type === 'disease' || result.type === 'pest') ? (
+            <button onClick={() => onIdentificationComplete(result)} className="bg-blue-600 text-white font-bold py-3 px-8 rounded-lg hover:bg-blue-700 transition-colors shadow-lg">
+                Знайти препарати для боротьби
+            </button>
+          ) : (
+            <p className="text-orange-600 bg-orange-50 p-3 rounded-lg max-w-xl mx-auto">Не вдалося визначити культуру з довідника або класифікувати проблему. Рекомендації недоступні.</p>
+          )}
+
+           <button onClick={reset} className="mt-4 text-sm text-gray-600 hover:underline">
+                Спробувати інше фото
+           </button>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default ProblemIdentifier;

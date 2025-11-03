@@ -135,7 +135,7 @@ const tomatoFungicides: Fungicide[] = [
     { activeIngredient: 'міді гідроксид', productName: 'Косайд 2000', category: 1, controls: { bacteriosis: true, phytophthora: true, rots: true, rootRots: false }, rateHome: '6 г/10л', rateField: '2,5 кг/га' },
     { activeIngredient: 'міді гідроксид', productName: 'Чемпіон', category: 1, controls: { bacteriosis: true, phytophthora: true, rots: true, rootRots: false }, rateHome: '5 мл/10л', rateField: '1,5 л/га' },
     { activeIngredient: 'міді гідроксид', productName: 'Ескада', category: 1, controls: { bacteriosis: true, phytophthora: true, rots: true, rootRots: false }, rateHome: null, rateField: '2 л/га' },
-    { activeIngredient: 'міді хлорокис', productName: 'Медян Екстра', category: 1, controls: { bacteriosis: true, phytophthora: true, rots: true, rootRots: true }, rateHome: '7 мл/10л', rateField: '2 л/га' },
+    { activeIngredient: 'міді хлорокис', productName: 'Медян Екстра', category: 1, controls: { bacteriosis: true, phytophthora: true, rots: true, rootRots: false }, rateHome: '7 мл/10л', rateField: '2 л/га' },
     { activeIngredient: 'міді сульфат', productName: 'Бордо МК', category: 1, controls: { bacteriosis: true, phytophthora: true, rots: true, rootRots: false }, rateHome: '10 мл/10л', rateField: '5 л/га' },
     { activeIngredient: 'міді сульфат', productName: 'Купроксат', category: 1, controls: { bacteriosis: true, phytophthora: true, rots: true, rootRots: false }, rateHome: '5 мл/10л', rateField: '5 л/га' },
     { activeIngredient: 'міді оксид', productName: 'Нордокс', category: 1, controls: { bacteriosis: true, phytophthora: true, rots: true, rootRots: false }, rateHome: '3,5 г/10л', rateField: '1 кг/га' },
@@ -236,7 +236,7 @@ const pepperFungicides: Fungicide[] = [
     { activeIngredient: 'трифлоксістробін+тебуконазол', productName: 'Натіво', category: 2, controls: { bacteriosis: false, phytophthora: false, rots: true, rootRots: false }, rateHome: null, rateField: '0,4 кг/га' },
     { activeIngredient: 'флуопіколід+пропамокарб', productName: 'Інфініто', category: 2, controls: { bacteriosis: false, phytophthora: true, rots: true, rootRots: false }, rateHome: '6 мл/10л', rateField: '1,6 л/га' },
     { activeIngredient: 'Streptomyces kasugaensis', productName: 'Казумін 2Л', category: 2, controls: { bacteriosis: true, phytophthora: false, rots: false, rootRots: false }, rateHome: '10 мл/10л', rateField: '3 л/га' },
-    { activeIngredient: 'хлорокис міді', productName: 'Медян Екстра', category: 1, controls: { bacteriosis: true, phytophthora: true, rots: true, rootRots: true }, rateHome: '7 мл/10л', rateField: '2 л/га' },
+    { activeIngredient: 'хлорокис міді', productName: 'Медян Екстра', category: 1, controls: { bacteriosis: true, phytophthora: true, rots: true, rootRots: false }, rateHome: '7 мл/10л', rateField: '2 л/га' },
     { activeIngredient: 'bacillus subtilis', productName: 'Серенада', category: 3, controls: { bacteriosis: true, phytophthora: true, rots: true, rootRots: true }, rateHome: null, rateField: '3 л/га' },
     { activeIngredient: 'мефеноксам + азоксистробін', productName: 'Юніформ', category: 2, controls: { bacteriosis: false, phytophthora: false, rots: true, rootRots: true }, rateHome: 'За рекомендацією', rateField: 'За рекомендацією' },
 ];
@@ -396,7 +396,7 @@ const cabbageFungicides: Fungicide[] = [
     { activeIngredient: 'тіофанат-метил', productName: 'Топсин М', category: 2, controls: { bacteriosis: false, phytophthora: false, rots: true, rootRots: true }, rateHome: '1 мл/10л', rateField: '1,5 л/га' },
     { activeIngredient: 'оксид міді', productName: 'Нордокс', category: 1, controls: { bacteriosis: true, phytophthora: true, rots: true, rootRots: false }, rateHome: '3,5 г/10л', rateField: '1 кг/га' },
     { activeIngredient: 'фосфат міді', productName: 'Блу Голд', category: 1, controls: { bacteriosis: true, phytophthora: true, rots: true, rootRots: false }, rateHome: '3 мл/10л', rateField: '5 л/га' },
-    { activeIngredient: 'хлорокис міді', productName: 'Медян Екстра', category: 1, controls: { bacteriosis: true, phytophthora: true, rots: true, rootRots: true }, rateHome: '7 мл/10л', rateField: '2 л/га' },
+    { activeIngredient: 'хлорокис міді', productName: 'Медян Екстра', category: 1, controls: { bacteriosis: true, phytophthora: true, rots: true, rootRots: false }, rateHome: '7 мл/10л', rateField: '2 л/га' },
     { activeIngredient: 'фосетил алюмінію', productName: 'Альєтт', category: 1, controls: { bacteriosis: true, phytophthora: true, rots: true, rootRots: false }, rateHome: '7 г/10л', rateField: '2 кг/га' },
     { activeIngredient: 'фосфіт алюмінію', productName: 'Фітал', category: 1, controls: { bacteriosis: true, phytophthora: true, rots: true, rootRots: true }, rateHome: '4 мл/10л', rateField: '1,5 л/га' },
     { activeIngredient: 'мефеноксам + азоксистробін', productName: 'Юніформ', category: 2, controls: { bacteriosis: false, phytophthora: false, rots: true, rootRots: true }, rateHome: 'За рекомендацією', rateField: 'За рекомендацією' },
@@ -757,7 +757,7 @@ const carrotFungicides: Fungicide[] = [
     { activeIngredient: 'флуопірам+тебуконазол', productName: 'Луна Експірієнс', category: 2, controls: { bacteriosis: false, phytophthora: false, rots: true, rootRots: true }, rateHome: '2,5 мл/10л', rateField: '0,75 л/га' },
     { activeIngredient: 'піраклостробін+боскалід', productName: 'Белліс', category: 2, controls: { bacteriosis: false, phytophthora: false, rots: true, rootRots: true }, rateHome: '2,5 г/10л', rateField: '0,8 кг/га' },
     { activeIngredient: 'флуксапіроксад+дифеноконазол', productName: 'Серкадіс Плюс', category: 2, controls: { bacteriosis: false, phytophthora: false, rots: true, rootRots: true }, rateHome: null, rateField: '1,5 л/га' },
-    { activeIngredient: 'хлорокис міді', productName: 'Медян Екстра', category: 1, controls: { bacteriosis: true, phytophthora: true, rots: true, rootRots: true }, rateHome: '7 мл/10л', rateField: '2 л/га' },
+    { activeIngredient: 'хлорокис міді', productName: 'Медян Екстра', category: 1, controls: { bacteriosis: true, phytophthora: true, rots: true, rootRots: false }, rateHome: '7 мл/10л', rateField: '2 л/га' },
 ];
 
 const carrotInsecticides: Insecticide[] = [
@@ -773,7 +773,7 @@ const pumpkinFungicides: Fungicide[] = [
     { activeIngredient: 'азоксистробін', productName: 'Квадріс', category: 2, controls: { bacteriosis: false, phytophthora: true, rots: true, rootRots: true }, rateHome: '2 мл/10л', rateField: '0,6 л/га' },
     { activeIngredient: 'ципродиніл+флудіоксоніл', productName: 'Світч', category: 2, controls: { bacteriosis: false, phytophthora: false, rots: true, rootRots: true }, rateHome: '1 г/10л', rateField: '1 кг/га' },
     { activeIngredient: 'пенконазол', productName: 'Топаз 100', category: 2, controls: { bacteriosis: false, phytophthora: false, rots: true, rootRots: false }, rateHome: '0,6 мл/10л', rateField: '0,15 л/га' },
-    { activeIngredient: 'хлорокис міді', productName: 'Медян Екстра', category: 1, controls: { bacteriosis: true, phytophthora: true, rots: true, rootRots: true }, rateHome: '7 мл/10л', rateField: '2 л/га' },
+    { activeIngredient: 'хлорокис міді', productName: 'Медян Екстра', category: 1, controls: { bacteriosis: true, phytophthora: true, rots: true, rootRots: false }, rateHome: '7 мл/10л', rateField: '2 л/га' },
     { activeIngredient: 'хлорокис міді+цимоксаніл', productName: 'Ордан', category: 1, controls: { bacteriosis: true, phytophthora: true, rots: false, rootRots: false }, rateHome: '5 г/10л', rateField: '1,5 кг/га' },
     { activeIngredient: 'фосетил алюмінію', productName: 'Альєтт', category: 1, controls: { bacteriosis: true, phytophthora: true, rots: true, rootRots: false }, rateHome: '7 г/10л', rateField: '2 кг/га' },
     { activeIngredient: 'цимоксаніл+оксихлорид міді', productName: 'Курзат Р', category: 2, controls: { bacteriosis: true, phytophthora: true, rots: true, rootRots: false }, rateHome: '8,5 г/10л', rateField: '2,5 кг/га' },
@@ -921,7 +921,7 @@ const eggplantHerbicides: Herbicide[] = [
 ];
 
 const eggplantFungicides: Fungicide[] = [
-    { activeIngredient: 'хлорокис міді', productName: 'Медян Екстра', category: 1, controls: { bacteriosis: true, phytophthora: true, rots: true, rootRots: true }, rateHome: '7 мл/10л', rateField: '2 л/га' },
+    { activeIngredient: 'хлорокис міді', productName: 'Медян Екстра', category: 1, controls: { bacteriosis: true, phytophthora: true, rots: true, rootRots: false }, rateHome: '7 мл/10л', rateField: '2 л/га' },
     { activeIngredient: 'манкоцеб', productName: 'Манзат', category: 1, controls: { bacteriosis: true, phytophthora: true, rots: true, rootRots: true }, rateHome: null, rateField: '1,6 кг/га' },
     { activeIngredient: 'металаксил-м+манкоцеб', productName: 'Ридоміл Голд', category: 2, controls: { bacteriosis: true, phytophthora: true, rots: true, rootRots: false }, rateHome: '5 г/10л', rateField: '2,5 кг/га' },
     { activeIngredient: 'азоксистробін', productName: 'Квадріс', category: 2, controls: { bacteriosis: false, phytophthora: true, rots: true, rootRots: true }, rateHome: '2 мл/10л', rateField: '0,6 л/га' },
@@ -1069,6 +1069,9 @@ const beetFungicides: Fungicide[] = [
     { activeIngredient: 'боскалід+піраклостробін', productName: 'Сігнум', category: 2, controls: { bacteriosis: false, phytophthora: true, rots: true, rootRots: true }, rateHome: '5 г/10л', rateField: '1,5 кг/га' },
     { activeIngredient: 'сірка', productName: 'Тіовіт Джет', category: 1, controls: { bacteriosis: false, phytophthora: false, rots: true, rootRots: false }, rateHome: '2,5 г/10л', rateField: '5 кг/га' },
     { activeIngredient: 'міді гідроксид', productName: 'Косайд 2000', category: 1, controls: { bacteriosis: true, phytophthora: true, rots: true, rootRots: false }, rateHome: '6 г/10л', rateField: '2,5 кг/га' },
+    { activeIngredient: 'пікоксистробін + ципроконазол', productName: 'Аканто Плюс', category: 2, controls: { bacteriosis: false, phytophthora: false, rots: true, rootRots: false }, rateHome: null, rateField: '0,75 л/га' },
+    { activeIngredient: 'флутріафол + карбендазим', productName: 'Імпакт К', category: 2, controls: { bacteriosis: false, phytophthora: false, rots: true, rootRots: false }, rateHome: null, rateField: '0,8 л/га' },
+    { activeIngredient: 'піраклостробін + епоксиконазол', productName: 'Абакус', category: 2, controls: { bacteriosis: false, phytophthora: false, rots: true, rootRots: false }, rateHome: null, rateField: '1,5 л/га' },
 ];
 
 const beetInsecticides: Insecticide[] = [
@@ -1109,7 +1112,6 @@ const celeryHerbicides: Herbicide[] = [
         },
         applicationInfo: 'Рекомендована норма внесення 1,2-1,5 л/га. Використовуйте нижчі норми на грубозернистих ґрунтах і вищі норми на грунтах з дрібним механічним складом. Препарат вносять до висадки розсади.',
     },
-// Fix: Completed the Herbicide object for 'Стомп' which was missing properties and had an incomplete description.
     {
         activeIngredient: 'пендиметалін',
         productName: 'Стомп',
@@ -1152,7 +1154,7 @@ const celeryFungicides: Fungicide[] = [
     { activeIngredient: 'боскалід+піраклостробін', productName: 'Сігнум', category: 2, controls: { bacteriosis: false, phytophthora: true, rots: true, rootRots: true }, rateHome: '5 г/10л', rateField: '1,5 кг/га' },
     { activeIngredient: 'флуопірам+тебуконазол', productName: 'Луна Експірієнс', category: 2, controls: { bacteriosis: false, phytophthora: false, rots: true, rootRots: true }, rateHome: '2,5 мл/10л', rateField: '0,75 л/га' },
     { activeIngredient: 'ципродиніл+флудіоксоніл', productName: 'Світч', category: 2, controls: { bacteriosis: false, phytophthora: false, rots: true, rootRots: true }, rateHome: '1 г/10л', rateField: '1 кг/га' },
-    { activeIngredient: 'хлорокис міді', productName: 'Медян Екстра', category: 1, controls: { bacteriosis: true, phytophthora: true, rots: true, rootRots: true }, rateHome: '7 мл/10л', rateField: '2 л/га' },
+    { activeIngredient: 'хлорокис міді', productName: 'Медян Екстра', category: 1, controls: { bacteriosis: true, phytophthora: true, rots: true, rootRots: false }, rateHome: '7 мл/10л', rateField: '2 л/га' },
 ];
 
 const celeryInsecticides: Insecticide[] = [
@@ -1162,7 +1164,6 @@ const celeryInsecticides: Insecticide[] = [
     { activeIngredient: 'спіротетрамат', productName: 'Мовенто', controls: { aphids: true, thrips: true, whiteflies: true, mites: true, lepidoptera: false, coleoptera: false }, rateHome: null, rateField: '1 л/га' },
 ];
 
-// Fix: Export cropData to make it available for import in other modules.
 export const cropData: CropData = {
   [CropType.Tomato]: {
     herbicides: tomatoHerbicides,

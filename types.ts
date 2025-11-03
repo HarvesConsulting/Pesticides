@@ -19,6 +19,14 @@ export enum ProblemType {
 
 export type PlotType = 'home' | 'field';
 
+export interface IdentificationResult {
+  crop: CropType | 'unknown';
+  name: string;
+  type: 'disease' | 'pest' | 'unknown';
+  description: string;
+  confidence: number;
+}
+
 export interface Herbicide {
   activeIngredient: string;
   productName: string;

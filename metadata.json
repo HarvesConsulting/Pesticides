@@ -1,5 +1,7 @@
 {
   "name": "Crop Protection System Builder",
   "description": "An application for building a protection system for vegetable crops against diseases, pests, and weeds, starting with tomatoes.",
-  "requestFramePermissions": []
+  "requestFramePermissions": [
+    "camera"
+  ]
 }

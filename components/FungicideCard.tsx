@@ -28,18 +28,33 @@ const FungicideCard: React.FC<FungicideCardProps> = ({ fungicide, plotType }) =>
   ];
 
   const rate = plotType === 'home' ? fungicide.rateHome : fungicide.rateField;
+  
+  const categoryInfo: { [key in 1 | 2 | 3]: { label: string; className: string } } = {
+    1: { label: 'Контактний', className: 'bg-sky-100 text-sky-800' },
+    2: { label: 'Системний', className: 'bg-amber-100 text-amber-800' },
+    3: { label: 'Біологічний', className: 'bg-emerald-100 text-emerald-800' },
+  };
+  
+  const category = categoryInfo[fungicide.category];
 
   return (
     <div className="bg-white rounded-lg shadow-md border border-gray-200 p-4 sm:p-6">
       <div className="flex flex-col sm:flex-row justify-between sm:items-start">
         <div>
           <h4 className="text-xl font-bold text-blue-800">{fungicide.productName}</h4>
-          <p className="text-md text-gray-600 mb-2">{fungicide.activeIngredient}</p>
-          {rate && (
-              <p className="text-sm font-semibold text-gray-800 bg-green-50 px-3 py-1.5 rounded-md inline-block">
+          <p className="text-md text-gray-600 mb-3">{fungicide.activeIngredient}</p>
+          <div className="flex flex-wrap gap-2 items-center">
+             {rate && (
+              <p className="text-sm font-semibold text-gray-800 bg-gray-100 px-3 py-1.5 rounded-md inline-block">
                   Норма: <span className="text-green-700 font-bold">{rate}</span>
               </p>
-          )}
+             )}
+            {category && (
+                <span className={`text-sm font-semibold px-3 py-1.5 rounded-md inline-block ${category.className}`}>
+                    {category.label}
+                </span>
+            )}
+          </div>
         </div>
         <div className="mt-4 sm:mt-0 sm:ml-6 grid grid-cols-2 gap-x-6 gap-y-2 text-sm">
           {controls.map(control => (

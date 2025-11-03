@@ -1,9 +1,11 @@
 import React, { useState, useRef, useEffect } from 'react';
 import AboutModal from './AboutModal';
+import { IdentifyIcon } from './icons/IdentifyIcon';
 
 interface HeaderProps {
     onHomeClick: () => void;
     onStartBuilder: () => void;
+    onGoToIdentifier: () => void;
 }
 
 const SandwichIcon = () => (
@@ -38,7 +40,7 @@ const AboutIcon = () => (
     </svg>
 );
 
-const Header: React.FC<HeaderProps> = ({ onHomeClick, onStartBuilder }) => {
+const Header: React.FC<HeaderProps> = ({ onHomeClick, onStartBuilder, onGoToIdentifier }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isAboutModalOpen, setIsAboutModalOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -68,6 +70,11 @@ const Header: React.FC<HeaderProps> = ({ onHomeClick, onStartBuilder }) => {
   const handleHomeClick = () => {
       onHomeClick();
       setIsMenuOpen(false);
+  }
+
+  const handleIdentifierClick = () => {
+    onGoToIdentifier();
+    setIsMenuOpen(false);
   }
 
   return (
@@ -118,6 +125,13 @@ const Header: React.FC<HeaderProps> = ({ onHomeClick, onStartBuilder }) => {
                     >
                         <BuilderIcon />
                         <span>Підібрати препарати</span>
+                    </button>
+                    <button 
+                        onClick={handleIdentifierClick}
+                        className="group flex items-center w-full text-left px-4 py-3 text-gray-700 hover:bg-green-50 hover:text-green-700 transition-colors"
+                    >
+                        <IdentifyIcon />
+                        <span>Визначити за фото</span>
                     </button>
                     <button 
                         onClick={handleOpenAbout}

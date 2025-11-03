@@ -114,6 +114,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ title, products, color, icon 
   );
 };
 
+
 const LandingPage: React.FC = () => {
   return (
     <div className="container mx-auto px-4 animate-fade-in">
