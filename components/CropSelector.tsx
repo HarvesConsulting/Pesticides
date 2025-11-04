@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { CropType } from '../types';
 import { TomatoIcon } from './icons/TomatoIcon';

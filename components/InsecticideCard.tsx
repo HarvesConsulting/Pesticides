@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Insecticide, PlotType } from '../types';
 

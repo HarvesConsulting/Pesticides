@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { CropType, IdentificationResult } from '../types';
 import ProblemIdentifier from './ProblemIdentifier';

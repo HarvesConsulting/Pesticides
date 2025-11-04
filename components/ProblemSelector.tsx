@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { ProblemType, CropType, PlotType } from '../types';
 import { WeedIcon } from './icons/WeedIcon';

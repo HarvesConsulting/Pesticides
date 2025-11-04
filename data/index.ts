@@ -1,3 +1,4 @@
+
 import { Herbicide, Fungicide, Insecticide, CropData, CropType } from '../types';
 
 const tomatoHerbicides: Herbicide[] = [

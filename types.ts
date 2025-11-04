@@ -1,3 +1,4 @@
+
 export enum CropType {
   Tomato = 'Tomato',
   Pepper = 'Pepper',
