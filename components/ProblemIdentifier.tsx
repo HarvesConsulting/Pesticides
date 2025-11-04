@@ -31,10 +31,10 @@ const resizeImage = (file: File): Promise<Blob> => {
     const img = new Image();
     img.src = url;
     img.onload = () => {
-      URL.revokeObjectURL(url); // Clean up memory
+      URL.revokeObjectURL(url); 
       const canvas = document.createElement('canvas');
-      const MAX_WIDTH = 512; // Reduced for mobile performance
-      const MAX_HEIGHT = 512; // Reduced for mobile performance
+      const MAX_WIDTH = 400; // Further reduced for mobile performance
+      const MAX_HEIGHT = 400; // Further reduced for mobile performance
       let width = img.width;
       let height = img.height;
 
@@ -65,12 +65,13 @@ const resizeImage = (file: File): Promise<Blob> => {
           }
         },
         'image/jpeg',
-        0.85 // Slightly reduced quality
+        0.8 // Further reduced quality
       );
     };
     img.onerror = (err) => {
-      URL.revokeObjectURL(url); // Clean up memory
-      reject(err);
+      URL.revokeObjectURL(url);
+      console.error("Image loading failed:", err);
+      reject(new Error("Не вдалося завантажити зображення для обробки."));
     };
   });
 };
@@ -92,6 +93,8 @@ const ProblemIdentifier: React.FC<ProblemIdentifierProps> = ({ cropNameMap, onBa
       setIsLoading(true);
       setError(null);
       setResult(null);
+      setImageSrc(null);
+      setImageBlob(null);
       try {
         const resizedBlob = await resizeImage(file);
         const reader = new FileReader();
@@ -100,10 +103,13 @@ const ProblemIdentifier: React.FC<ProblemIdentifierProps> = ({ cropNameMap, onBa
           setImageBlob(resizedBlob);
           setIsLoading(false);
         };
+        reader.onerror = () => {
+            throw new Error("Не вдалося прочитати оброблене зображення.");
+        }
         reader.readAsDataURL(resizedBlob);
-      } catch (err) {
-        console.error("Image processing error:", err);
-        setError("Не вдалося обробити зображення. Будь ласка, спробуйте інше.");
+      } catch (err: any) {
+        console.error("Помилка обробки зображення:", err);
+        setError(err.message || "Не вдалося обробити зображення. Будь ласка, спробуйте інше.");
         setIsLoading(false);
       }
     }
@@ -159,8 +165,8 @@ const ProblemIdentifier: React.FC<ProblemIdentifierProps> = ({ cropNameMap, onBa
       setResult(parsedResult);
 
     } catch (err) {
-      console.error(err);
-      setError('Не вдалося розпізнати проблему. Спробуйте інше фото або перевірте з\'єднання.');
+      console.error("ПОМИЛКА ІДЕНТИФІКАЦІЇ:", err);
+      setError('Не вдалося розпізнати проблему. Спробуйте інше фото або перевірте з\'єднання. (Деталі в консолі розробника)');
     } finally {
       setIsLoading(false);
     }
