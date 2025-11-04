@@ -33,8 +33,8 @@ const resizeImage = (file: File): Promise<Blob> => {
     img.onload = () => {
       URL.revokeObjectURL(url); // Clean up memory
       const canvas = document.createElement('canvas');
-      const MAX_WIDTH = 800;
-      const MAX_HEIGHT = 800;
+      const MAX_WIDTH = 512; // Reduced for mobile performance
+      const MAX_HEIGHT = 512; // Reduced for mobile performance
       let width = img.width;
       let height = img.height;
 
@@ -65,7 +65,7 @@ const resizeImage = (file: File): Promise<Blob> => {
           }
         },
         'image/jpeg',
-        0.9
+        0.85 // Slightly reduced quality
       );
     };
     img.onerror = (err) => {
@@ -120,10 +120,10 @@ const ProblemIdentifier: React.FC<ProblemIdentifierProps> = ({ cropNameMap, onBa
       const ai = new GoogleGenAI({ apiKey: process.env.API_KEY as string });
 
       const cropList = Object.values(CropType).join(', ');
-      const promptText = `Ідентифікуй культуру, а також хворобу або шкідника на цьому фото. Надай відповідь у форматі JSON.
-Для поля 'crop' використовуй одне з цих значень: [${cropList}]. Якщо не можеш визначити культуру з цього списку, встанови 'unknown'.
-Для поля 'type' використовуй одне з цих значень: 'disease', 'pest', або 'unknown'.
-JSON об'єкт повинен мати такі поля: 'crop' (назва культури англійською), 'name' (назва проблеми українською), 'type' (тип проблеми), 'description' (короткий опис проблеми), 'confidence' (число від 0 до 100, що відображає загальну впевненість).`;
+      const promptText = `Проаналізуй це зображення. Ідентифікуй культуру, а також будь-яку хворобу або шкідника.
+- У полі 'crop' використовуй значення з цього списку: [${cropList}], або 'unknown', якщо культура не зі списку.
+- У полі 'type' використовуй 'disease', 'pest', або 'unknown'.
+- Надай відповідь виключно у форматі JSON згідно зі схемою.`;
 
       const response = await ai.models.generateContent({
         model: 'gemini-2.5-flash',
