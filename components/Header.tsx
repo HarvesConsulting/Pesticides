@@ -17,9 +17,12 @@ const Header: React.FC<HeaderProps> = ({ onHomeClick, onMenuClick }) => {
           <svg className="w-11 h-11 text-green-600 mr-3 group-hover:scale-105 transition-transform duration-300" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
               <path d="M12 3a12 12 0 0 0 8.5 3a12 12 0 0 1 -8.5 15a12 12 0 0 1 -8.5 -15a12 12 0 0 0 8.5 -3" />
           </svg>
-          <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-green-600 to-emerald-600 hidden sm:block">
-            Система Захисту Овочів
-          </h1>
+          <div>
+            <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-green-600 to-emerald-600 hidden sm:block leading-tight">
+              Система Захисту Овочів
+            </h1>
+            <p className="text-xs text-gray-500 hidden sm:block">оновлено 04.11.2025</p>
+          </div>
         </div>
         <div>
             <button 
