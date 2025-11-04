@@ -1,5 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { GoogleGenAI, Type } from "@google/genai";
+import imageCompression from 'browser-image-compression';
 import { CropType, IdentificationResult } from '../types';
 import { CameraIcon } from './icons/CameraIcon';
 import { UploadIcon } from './icons/UploadIcon';
@@ -9,57 +10,6 @@ interface ProblemIdentifierProps {
   onBackToLanding: () => void;
   onIdentificationComplete: (result: IdentificationResult) => void;
 }
-
-const resizeImage = (file: File, maxSize: number): Promise<Blob> => {
-  return new Promise((resolve, reject) => {
-    const image = new Image();
-    const url = URL.createObjectURL(file);
-
-    image.onload = () => {
-        URL.revokeObjectURL(url); // Clean up the object URL immediately
-
-        const canvas = document.createElement('canvas');
-        let { width, height } = image;
-
-        if (width > height) {
-            if (width > maxSize) {
-                height *= maxSize / width;
-                width = maxSize;
-            }
-        } else {
-            if (height > maxSize) {
-                width *= maxSize / height;
-                height = maxSize;
-            }
-        }
-
-        canvas.width = width;
-        canvas.height = height;
-        const ctx = canvas.getContext('2d');
-        if (!ctx) {
-            return reject(new Error('Could not get canvas context'));
-        }
-        
-        ctx.drawImage(image, 0, 0, width, height);
-
-        canvas.toBlob((blob) => {
-            if (blob) {
-                resolve(blob);
-            } else {
-                reject(new Error('Canvas to Blob conversion failed'));
-            }
-        }, 'image/jpeg', 0.9);
-    };
-
-    image.onerror = (err) => {
-        URL.revokeObjectURL(url);
-        reject(err);
-    };
-
-    image.src = url;
-  });
-};
-
 
 const blobToBase64 = (blob: Blob): Promise<string> => {
   return new Promise((resolve, reject) => {
@@ -114,9 +64,15 @@ const ProblemIdentifier: React.FC<ProblemIdentifierProps> = ({ cropNameMap, onBa
       setImageBase64(null);
 
       try {
-        const resizedBlob = await resizeImage(file, 1024);
-        const base64Data = await blobToBase64(resizedBlob);
-        const previewUrl = URL.createObjectURL(resizedBlob);
+        const options = {
+          maxSizeMB: 1,
+          maxWidthOrHeight: 1024,
+          useWebWorker: true
+        }
+        
+        const compressedFile = await imageCompression(file, options);
+        const base64Data = await blobToBase64(compressedFile);
+        const previewUrl = URL.createObjectURL(compressedFile);
         
         setImageSrc(previewUrl);
         setImageBase64(base64Data);
