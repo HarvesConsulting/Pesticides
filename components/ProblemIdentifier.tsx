@@ -83,18 +83,33 @@ const ProblemIdentifier: React.FC<ProblemIdentifierProps> = ({ cropNameMap, onBa
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<IdentificationResult | null>(null);
+  const [inputKey, setInputKey] = useState<string>(`key-${Date.now()}`);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const cameraInputRef = useRef<HTMLInputElement>(null);
+
+  const handleFileTrigger = (useCamera: boolean) => {
+    const input = fileInputRef.current;
+    if (input) {
+        if (useCamera) {
+            input.setAttribute('capture', 'environment');
+        } else {
+            input.removeAttribute('capture');
+        }
+        input.click();
+    }
+  };
 
   const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    // Force re-mount of the input for the next attempt by changing its key.
+    // This is the most reliable way to handle file inputs on mobile.
+    setInputKey(`key-${Date.now()}`);
+
     const file = event.target.files?.[0];
     if (file) {
       setIsLoading(true);
       setError(null);
       setResult(null);
       
-      // Clean up previous image if it was a blob URL
       if (imageSrc && imageSrc.startsWith('blob:')) {
           URL.revokeObjectURL(imageSrc);
       }
@@ -113,8 +128,6 @@ const ProblemIdentifier: React.FC<ProblemIdentifierProps> = ({ cropNameMap, onBa
         setError(err.message || "Не вдалося обробити зображення. Будь ласка, спробуйте інше.");
       } finally {
         setIsLoading(false);
-        // Reset the input value to allow selecting the same file again or re-triggering the camera
-        event.target.value = '';
       }
     }
   };
@@ -189,21 +202,29 @@ const ProblemIdentifier: React.FC<ProblemIdentifierProps> = ({ cropNameMap, onBa
     setImageBase64(null);
     setResult(null);
     setError(null);
+    setInputKey(`key-reset-${Date.now()}`);
   }
 
   return (
     <div className="bg-white p-6 sm:p-8 rounded-xl shadow-lg animate-fade-in">
       <h2 className="text-2xl md:text-3xl font-bold text-gray-800 mb-6 text-center">Визначити проблему за фото</h2>
       
+      <input 
+        key={inputKey}
+        type="file" 
+        accept="image/*" 
+        ref={fileInputRef} 
+        onChange={handleFileChange} 
+        className="hidden" 
+      />
+
       {!imageSrc && !isLoading && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-            <input type="file" accept="image/*" ref={cameraInputRef} onChange={handleFileChange} capture="environment" className="hidden" />
-            <button onClick={() => cameraInputRef.current?.click()} className="p-8 rounded-lg border-2 border-dashed border-gray-300 hover:border-green-500 hover:bg-green-50 transition-colors flex flex-col items-center justify-center">
+            <button onClick={() => handleFileTrigger(true)} className="p-8 rounded-lg border-2 border-dashed border-gray-300 hover:border-green-500 hover:bg-green-50 transition-colors flex flex-col items-center justify-center">
                 <CameraIcon className="w-12 h-12 text-gray-500 mb-2" />
                 <span className="font-semibold text-gray-700">Зробити фото</span>
             </button>
-            <input type="file" accept="image/*" ref={fileInputRef} onChange={handleFileChange} className="hidden" />
-            <button onClick={() => fileInputRef.current?.click()} className="p-8 rounded-lg border-2 border-dashed border-gray-300 hover:border-blue-500 hover:bg-blue-50 transition-colors flex flex-col items-center justify-center">
+            <button onClick={() => handleFileTrigger(false)} className="p-8 rounded-lg border-2 border-dashed border-gray-300 hover:border-blue-500 hover:bg-blue-50 transition-colors flex flex-col items-center justify-center">
                 <UploadIcon className="w-12 h-12 text-gray-500 mb-2" />
                 <span className="font-semibold text-gray-700">Завантажити з галереї</span>
             </button>
