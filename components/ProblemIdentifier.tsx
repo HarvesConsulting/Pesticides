@@ -127,12 +127,7 @@ const ProblemIdentifier: React.FC<ProblemIdentifierProps> = ({ cropNameMap, onBa
       const ai = new GoogleGenAI({ apiKey: process.env.API_KEY as string });
 
       const cropList = Object.values(CropType).join(', ');
-      const promptText = `Проаналізуй це зображення та надай відповідь ВИКЛЮЧНО УКРАЇНСЬКОЮ МОВОЮ. Ідентифікуй культуру, а також будь-яку хворобу або шкідника.
-- У полі 'crop' використовуй значення з цього списку: [${cropList}], або 'unknown', якщо культура не зі списку.
-- У полі 'name' напиши назву хвороби/шкідника українською.
-- У полі 'type' використовуй 'disease', 'pest', або 'unknown'.
-- У полі 'description' надай детальний опис українською.
-- Надай відповідь виключно у форматі JSON згідно зі схемою.`;
+      const promptText = `Ідентифікуй рослину на цьому зображенні, а також будь-яку хворобу чи шкідника. Надай відповідь українською мовою. У полі 'crop' використовуй одне з цих значень: [${cropList}], або 'unknown', якщо не вдається визначити.`;
 
       const response = await ai.models.generateContent({
         model: 'gemini-2.5-flash',
@@ -169,7 +164,11 @@ const ProblemIdentifier: React.FC<ProblemIdentifierProps> = ({ cropNameMap, onBa
 
     } catch (err) {
       console.error("ПОМИЛКА ІДЕНТИФІКАЦІЇ:", err);
-      setError('Не вдалося розпізнати проблему. Можливі причини: слабкий інтернет-сигнал або фото низької якості. Спробуйте зробити більш чітке фото або повторіть спробу пізніше.');
+      let userMessage = 'Під час аналізу сталася помилка. Це може бути пов\'язано з тимчасовою проблемою на сервері або з контентом зображення. Будь ласка, спробуйте ще раз або використайте інше фото.';
+      if (err instanceof Error && err.message.includes('SAFETY')) {
+        userMessage = 'Зображення не вдалося обробити через налаштування безпеки. Спробуйте інше фото.';
+      }
+      setError(userMessage);
     } finally {
       setIsLoading(false);
     }
