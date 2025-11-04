@@ -9,9 +9,11 @@ import Stepper from './components/Stepper';
 import LandingPage from './components/LandingPage';
 import PlotTypeSelector from './components/PlotTypeSelector';
 import IntegratedSystemModal from './components/IntegratedSystemModal';
-import { cropData } from './data';
-import BackButton from './components/BackButton';
 import StandaloneIdentifierPage from './components/StandaloneIdentifierPage';
+import BackButton from './components/BackButton';
+import Sidebar from './components/Sidebar';
+import AboutModal from './components/AboutModal';
+import { cropData } from './data';
 
 type Product = Fungicide | Insecticide;
 
@@ -28,7 +30,35 @@ const App: React.FC = () => {
   const [plotType, setPlotType] = useState<PlotType | null>(null);
   const [isIntegratedModalOpen, setIsIntegratedModalOpen] = useState(false);
   const [integratedSystemPlan, setIntegratedSystemPlan] = useState<any[] | null>(null);
+  const [identificationResult, setIdentificationResult] = useState<IdentificationResult | null>(null);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isAboutModalOpen, setIsAboutModalOpen] = useState(false);
 
+  const handleBack = () => {
+    if (view === 'builder') {
+      if (currentStep > 1) {
+        setCurrentStep(currentStep - 1);
+      } else {
+        setView('plotTypeSelection');
+      }
+    } else if (view === 'plotTypeSelection') {
+      setView('landing');
+    } else if (view === 'identifier') {
+      setView('landing');
+    }
+  };
+
+  const handleSelectPlotType = (type: PlotType) => {
+    setPlotType(type);
+    if (identificationResult) {
+        setSelectedCrop(identificationResult.crop as CropType);
+        setSelectedProblem(identificationResult.type === 'disease' ? ProblemType.Diseases : ProblemType.Pests);
+        setCurrentStep(3); // Skip to results
+    } else {
+        setCurrentStep(1);
+    }
+    setView('builder');
+  };
 
   const handleSelectCrop = (crop: CropType) => {
     setSelectedCrop(crop);
@@ -45,15 +75,6 @@ const App: React.FC = () => {
     }
   };
 
-  const handleSelectPlotType = (type: PlotType) => {
-    setPlotType(type);
-    setView('builder');
-    // If we came from the identifier, jump to results
-    if (selectedCrop && selectedProblem) {
-        setCurrentStep(3);
-    }
-  }
-
   const goToStep = (step: number) => {
     if (step < currentStep) {
       if (step === 1) {
@@ -65,40 +86,38 @@ const App: React.FC = () => {
       setCurrentStep(step);
     }
   };
-  
-  const resetBuilder = () => {
+
+  const resetState = () => {
     setCurrentStep(1);
     setSelectedCrop(null);
     setSelectedProblem(null);
     setIntegratedSystemPlan(null);
     setPlotType(null);
-    setView('plotTypeSelection');
+    setIdentificationResult(null);
   };
-  
+
   const startBuilder = () => {
-    resetBuilder();
-  }
+    resetState();
+    setView('plotTypeSelection');
+    setIsSidebarOpen(false);
+  };
 
   const goToLanding = () => {
+      resetState();
       setView('landing');
-      setCurrentStep(1);
-      setSelectedCrop(null);
-      setSelectedProblem(null);
-      setIntegratedSystemPlan(null);
-      setPlotType(null);
-  }
-
+      setIsSidebarOpen(false);
+  };
+  
   const goToIdentifier = () => {
-      setView('identifier');
-  }
-
+    setView('identifier');
+    setIsSidebarOpen(false);
+  };
+  
   const handleIdentificationComplete = (result: IdentificationResult) => {
-      if (result.crop !== 'unknown' && (result.type === 'disease' || result.type === 'pest')) {
-          setSelectedCrop(result.crop);
-          const problem = result.type === 'disease' ? ProblemType.Diseases : ProblemType.Pests;
-          setSelectedProblem(problem);
-          setView('plotTypeSelection');
-      }
+    if (result.crop !== 'unknown' && (result.type === 'disease' || result.type === 'pest')) {
+        setIdentificationResult(result);
+        setView('plotTypeSelection');
+    }
   };
   
   const generatePlan = (crop: CropType, period: number) => {
@@ -125,7 +144,6 @@ const App: React.FC = () => {
     const isFungicide = (p: Product): p is Fungicide => 'category' in p;
     const isInsecticide = (p: Product): p is Insecticide => !('category' in p);
 
-    // Helper functions for tank mix rules
     const isRidomilGoldR = (p: Product): boolean => p.productName === 'Ридоміл Голд Р';
     const isBannedContactProduct = (p: Product): boolean => {
       const ai = p.activeIngredient.toLowerCase();
@@ -176,13 +194,12 @@ const App: React.FC = () => {
 
         for (const target of candidateTargets) {
             if (!allExistingFlexibleTargets.has(target)) {
-                return false; // Found new coverage, so the overlap is not redundant
+                return false; 
             }
         }
 
-        return true; // All of the candidate's targets are already covered. Redundant.
+        return true; 
     };
-
 
     for (let i = 0; i < numTreatments; i++) {
         const treatmentNumber = i + 1;
@@ -209,7 +226,6 @@ const App: React.FC = () => {
         const addProduct = (product: Product): boolean => {
             if (treatmentProducts.length >= 4) return false;
             treatmentProducts.push(product);
-            // FIX: Use the 'product' parameter instead of the out-of-scope variable 'p'.
             const key = `${product.productName}|${product.activeIngredient}`;
             usageCount.set(key, (usageCount.get(key) ?? 0) + 1);
             updateTargets(product);
@@ -224,8 +240,7 @@ const App: React.FC = () => {
                    !(treatmentNumber > 3 && isCat1Fungicide);
         }));
 
-        // --- Main Selection Logic ---
-        if (treatmentNumber <= 3) { // Phase 1: Greedy
+        if (treatmentNumber <= 3) { 
             let greedyPool = [...initialProductsPoolForTurn];
             while (Object.values(targets).some(v => v === true) && treatmentProducts.length < 4 && greedyPool.length > 0) {
                 let bestProduct: Product | null = null;
@@ -269,7 +284,7 @@ const App: React.FC = () => {
                     break;
                 }
             }
-        } else { // Phase 2: Combinatorial
+        } else { 
             const findAndAdd = (target: string) => {
                 if (!targets[target] || treatmentProducts.length >= 4) return;
                 
@@ -297,12 +312,10 @@ const App: React.FC = () => {
             findAndAdd('sucking');
         }
         
-        // --- Post-check and Fix Logic ---
         const postCheckAndFix = (target: keyof typeof targets, priorityList: string[], fullProductPool: Product[]) => {
             if (targets[target] && treatmentProducts.length < 4) {
                 let productToAdd: Product | null = null;
                 for (const name of priorityList) {
-                    // Search in the full pool for this turn, not a filtered one
                     const candidate = fullProductPool.find(p => 
                         (name === 'Децис' ? p.productName.startsWith('Децис') : p.productName === name) &&
                         !treatmentProducts.some(tp => tp.productName === p.productName) &&
@@ -310,7 +323,6 @@ const App: React.FC = () => {
                         !lastTreatmentProductKeys.has(`${p.productName}|${p.activeIngredient}`)
                     );
                     if (candidate) {
-                        // For post-fix, we ignore the redundant overlap rule to ensure coverage
                         if (!wouldBeInvalidMix(candidate, treatmentProducts)) {
                             productToAdd = candidate;
                             break;
@@ -325,7 +337,6 @@ const App: React.FC = () => {
         postCheckAndFix('coleoptera', ['Моспілан', 'Актара', 'Децис', 'Карате Зеон'], allProducts);
         postCheckAndFix('lepidoptera', ['Белт', 'Радіант', 'Проклейм', 'Ампліго', 'Кораген'], allProducts);
 
-        // --- Finalize and store ---
         const allPossibleTargets = ['phytophthora', 'rots', 'bacteriosis', 'lepidoptera', 'coleoptera', 'sucking'];
         const uncoveredTargets = allPossibleTargets.filter(t => targets[t]);
         plan.push({ treatmentNumber, products: treatmentProducts, uncoveredTargets });
@@ -336,149 +347,128 @@ const App: React.FC = () => {
     return plan;
   };
 
-  const handleGenerateSystem = (period: number) => {
-    if (selectedCrop) {
-        const plan = generatePlan(selectedCrop, period);
-        setIntegratedSystemPlan(plan);
-        setCurrentStep(3);
+  const handleGenerateSystem = (growingPeriod: number) => {
+      if (!selectedCrop) return;
+      const plan = generatePlan(selectedCrop, growingPeriod);
+      setIntegratedSystemPlan(plan);
+      setIsIntegratedModalOpen(false);
+      setCurrentStep(3);
+  };
+
+  const cropNameMap = {
+    [CropType.Tomato]: 'томатів',
+    [CropType.Pepper]: 'перцю',
+    [CropType.Cabbage]: 'капусти',
+    [CropType.Onion]: 'цибулі',
+    [CropType.Carrot]: 'моркви',
+    [CropType.Pumpkin]: 'гарбузових',
+    [CropType.Eggplant]: 'баклажанів',
+    [CropType.Beet]: 'буряків',
+    [CropType.Celery]: 'селери',
+  };
+
+  const problemNameMap = {
+    [ProblemType.Weeds]: "Бур'яни",
+    [ProblemType.Diseases]: "Хвороби",
+    [ProblemType.Pests]: "Шкідники",
+    [ProblemType.Integrated]: "Інтегрована система захисту",
+  };
+
+  const steps = [
+    { number: 1, title: 'Вибір культури' },
+    { number: 2, title: 'Вибір проблеми' },
+    { number: 3, title: 'Результати' },
+  ];
+
+  const renderBuilderContent = () => {
+    switch (currentStep) {
+      case 1:
+        return (
+          <>
+            <h2 className="text-2xl md:text-3xl font-bold text-gray-800 mb-6">Крок 1: Оберіть культуру</h2>
+            <CropSelector selectedCrop={selectedCrop} onSelectCrop={handleSelectCrop} />
+          </>
+        );
+      case 2:
+        return (
+          <>
+            <h2 className="text-2xl md:text-3xl font-bold text-gray-800 mb-6">Крок 2: Оберіть проблему для {selectedCrop && cropNameMap[selectedCrop]}</h2>
+            {selectedCrop && plotType && <ProblemSelector selectedCrop={selectedCrop} plotType={plotType} selectedProblem={selectedProblem} onSelectProblem={handleSelectProblem} />}
+          </>
+        );
+      case 3:
+        return (
+          <>
+            <h2 className="text-2xl md:text-3xl font-bold text-gray-800 mb-2">Результати</h2>
+            {selectedCrop && selectedProblem && <p className="text-gray-600 mb-6">Рекомендації для <strong>{selectedCrop && cropNameMap[selectedCrop]}</strong> по проблемі: <strong>{problemNameMap[selectedProblem]}</strong></p>}
+            {selectedProblem && selectedCrop && plotType && <ResultsDisplay problemType={selectedProblem} cropType={selectedCrop} plotType={plotType} integratedSystemPlan={integratedSystemPlan} />}
+            
+            <div className="mt-8 flex items-center justify-between">
+                <button onClick={handleBack} className="text-gray-600 hover:text-green-700 font-semibold transition-colors">
+                    &larr; Повернутись до вибору проблеми
+                </button>
+                <button
+                onClick={startBuilder}
+                className="bg-green-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-green-700 transition-colors shadow-lg"
+                >
+                Спробувати ще раз
+                </button>
+            </div>
+          </>
+        );
+      default:
+        return null;
     }
-    setIsIntegratedModalOpen(false);
+  };
+
+  const renderMainContent = () => {
+    switch(view) {
+        case 'identifier':
+            return <StandaloneIdentifierPage cropNameMap={cropNameMap} onBackToLanding={goToLanding} onIdentificationComplete={handleIdentificationComplete} />;
+        case 'plotTypeSelection':
+            return <PlotTypeSelector onSelectPlotType={handleSelectPlotType} />;
+        case 'builder':
+            return (
+                <>
+                    <BackButton onClick={handleBack} />
+                    <Stepper steps={steps} currentStep={currentStep} goToStep={goToStep} />
+                    <div className="bg-white p-6 sm:p-8 rounded-xl shadow-lg animate-fade-in">
+                        {renderBuilderContent()}
+                    </div>
+                </>
+            );
+        case 'landing':
+        default:
+            return <LandingPage />;
+    }
   }
 
-  const handleBack = () => {
-    if (view === 'builder') {
-      if (currentStep === 3) {
-        // From Results to Problem Selection
-        setCurrentStep(2);
-        setSelectedProblem(null);
-        setIntegratedSystemPlan(null);
-      } else if (currentStep === 2) {
-        // From Problem Selection to Crop Selection
-        setCurrentStep(1);
-        setSelectedCrop(null);
-        setSelectedProblem(null);
-      } else if (currentStep === 1) {
-        // From Crop Selection to Plot Type Selection
-        setView('plotTypeSelection');
-        setPlotType(null);
-        setSelectedCrop(null);
-      }
-    } else if (view === 'plotTypeSelection') {
-      // From Plot Type Selection to Landing page
-      goToLanding();
-    } else if (view === 'identifier') {
-      // From Identifier to Landing page
-      goToLanding();
-    }
-  };
-  
-    const cropNameMap: Record<CropType, string> = {
-        [CropType.Tomato]: 'Томат',
-        [CropType.Pepper]: 'Перець',
-        [CropType.Cabbage]: 'Капуста',
-        [CropType.Onion]: 'Цибуля',
-        [CropType.Carrot]: 'Морква',
-        [CropType.Pumpkin]: 'Гарбузові',
-        [CropType.Eggplant]: 'Баклажан',
-        [CropType.Beet]: 'Буряк',
-        [CropType.Celery]: 'Селера',
-    };
-    
-    const cropNameMapGenitive: Record<CropType, string> = {
-        [CropType.Tomato]: 'томатів',
-        [CropType.Pepper]: 'перцю',
-        [CropType.Cabbage]: 'капусти',
-        [CropType.Onion]: 'цибулі',
-        [CropType.Carrot]: 'моркви',
-        [CropType.Pumpkin]: 'гарбузових',
-        [CropType.Eggplant]: 'баклажанів',
-        [CropType.Beet]: 'буряків',
-        [CropType.Celery]: 'селери',
-    };
-    
-    const problemNameMap: Record<ProblemType, string> = {
-        [ProblemType.Weeds]: "Бур'яни",
-        [ProblemType.Diseases]: "Хвороби",
-        [ProblemType.Pests]: "Шкідники",
-        [ProblemType.Integrated]: "Інтегрована система захисту",
-    };
-
-  const mainContent = () => {
-    if (view === 'landing') {
-      return <LandingPage />;
-    }
-    
-    if (view === 'identifier') {
-        return <StandaloneIdentifierPage cropNameMap={cropNameMap} onIdentificationComplete={handleIdentificationComplete} onBackToLanding={goToLanding} />;
-    }
-
-    if (view === 'plotTypeSelection') {
-        return (
-            <div className="container mx-auto px-4 py-8">
-                <BackButton onClick={handleBack} />
-                <PlotTypeSelector onSelectPlotType={handleSelectPlotType} />
-            </div>
-        );
-    }
-    
-    // view === 'builder'
-    const steps = [
-        { number: 1, title: 'Вибір культури' },
-        { number: 2, title: 'Вибір проблеми' },
-        { number: 3, title: 'Результат' },
-    ];
-    
-    return (
-        <div className="container mx-auto px-4 py-8">
-            <BackButton onClick={handleBack} />
-            <Stepper steps={steps} currentStep={currentStep} goToStep={goToStep} />
-            <div className="bg-white p-6 sm:p-8 rounded-xl shadow-lg mt-8">
-              {currentStep === 1 && (
-                  <>
-                    <h2 className="text-2xl md:text-3xl font-bold text-gray-800 mb-6">Крок 1: Оберіть культуру</h2>
-                    <CropSelector selectedCrop={selectedCrop} onSelectCrop={handleSelectCrop} />
-                  </>
-              )}
-              {currentStep === 2 && selectedCrop && plotType && (
-                  <>
-                    <h2 className="text-2xl md:text-3xl font-bold text-gray-800 mb-6">Крок 2: Оберіть проблему для {cropNameMapGenitive[selectedCrop]}</h2>
-                    <ProblemSelector selectedCrop={selectedCrop} plotType={plotType} selectedProblem={selectedProblem} onSelectProblem={handleSelectProblem} />
-                  </>
-              )}
-              {currentStep === 3 && selectedCrop && selectedProblem && plotType && (
-                  <>
-                    <h2 className="text-2xl md:text-3xl font-bold text-gray-800 mb-2">Результати</h2>
-                    <p className="text-gray-600 mb-6">
-                        Рекомендації для <strong>{cropNameMapGenitive[selectedCrop]}</strong> по проблемі: <strong>{problemNameMap[selectedProblem]}</strong>
-                    </p>
-                    <ResultsDisplay problemType={selectedProblem} cropType={selectedCrop} plotType={plotType} integratedSystemPlan={integratedSystemPlan} />
-                    <div className="mt-8 text-center border-t pt-6">
-                        <button
-                            onClick={handleBack}
-                            className="inline-flex items-center bg-gray-200 text-gray-800 font-bold py-3 px-6 rounded-lg hover:bg-gray-300 transition-colors shadow-sm"
-                            aria-label="Повернутись до вибору проблеми"
-                        >
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                            </svg>
-                            <span>Повернутись до вибору проблеми</span>
-                        </button>
-                    </div>
-                  </>
-              )}
-            </div>
-        </div>
-    );
-  };
-  
   return (
-    <div className="min-h-screen flex flex-col bg-gray-50">
-      <Header onHomeClick={goToLanding} onStartBuilder={startBuilder} onGoToIdentifier={goToIdentifier} />
+    <div className="min-h-screen flex flex-col">
+      <Header onHomeClick={goToLanding} onMenuClick={() => setIsSidebarOpen(true)} />
+      <Sidebar 
+        isOpen={isSidebarOpen}
+        onClose={() => setIsSidebarOpen(false)}
+        onGoHome={goToLanding}
+        onStartBuilder={startBuilder}
+        onGoToIdentifier={goToIdentifier}
+        onOpenAbout={() => {
+            setIsAboutModalOpen(true);
+            setIsSidebarOpen(false);
+        }}
+      />
       <main className="flex-grow">
-          {mainContent()}
+        <div className="container mx-auto px-4 py-8">
+            {renderMainContent()}
+        </div>
       </main>
+      <IntegratedSystemModal 
+        isOpen={isIntegratedModalOpen} 
+        onClose={() => setIsIntegratedModalOpen(false)}
+        onSubmit={handleGenerateSystem}
+      />
+      <AboutModal isOpen={isAboutModalOpen} onClose={() => setIsAboutModalOpen(false)} />
       <Footer />
-      <IntegratedSystemModal isOpen={isIntegratedModalOpen} onClose={() => setIsIntegratedModalOpen(false)} onSubmit={handleGenerateSystem} />
     </div>
   );
 };

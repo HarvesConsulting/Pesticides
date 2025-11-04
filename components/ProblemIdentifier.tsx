@@ -25,6 +25,57 @@ const blobToBase64 = (blob: Blob): Promise<string> => {
   });
 };
 
+const resizeImage = (file: File): Promise<Blob> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = (event) => {
+      const img = new Image();
+      img.src = event.target?.result as string;
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const MAX_WIDTH = 800;
+        const MAX_HEIGHT = 800;
+        let width = img.width;
+        let height = img.height;
+
+        if (width > height) {
+          if (width > MAX_WIDTH) {
+            height *= MAX_WIDTH / width;
+            width = MAX_WIDTH;
+          }
+        } else {
+          if (height > MAX_HEIGHT) {
+            width *= MAX_HEIGHT / height;
+            height = MAX_HEIGHT;
+          }
+        }
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) {
+          return reject(new Error('Could not get canvas context'));
+        }
+        ctx.drawImage(img, 0, 0, width, height);
+        canvas.toBlob(
+          (blob) => {
+            if (blob) {
+              resolve(blob);
+            } else {
+              reject(new Error('Canvas to Blob conversion failed'));
+            }
+          },
+          'image/jpeg',
+          0.9
+        );
+      };
+      img.onerror = reject;
+    };
+    reader.onerror = reject;
+  });
+};
+
+
 const ProblemIdentifier: React.FC<ProblemIdentifierProps> = ({ cropNameMap, onBackToLanding, onIdentificationComplete }) => {
   const [imageSrc, setImageSrc] = useState<string | null>(null);
   const [imageBlob, setImageBlob] = useState<Blob | null>(null);
@@ -35,17 +86,26 @@ const ProblemIdentifier: React.FC<ProblemIdentifierProps> = ({ cropNameMap, onBa
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
 
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        setImageSrc(e.target?.result as string);
-        setImageBlob(file);
-        setResult(null);
-        setError(null);
-      };
-      reader.readAsDataURL(file);
+      setIsLoading(true);
+      setError(null);
+      setResult(null);
+      try {
+        const resizedBlob = await resizeImage(file);
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          setImageSrc(e.target?.result as string);
+          setImageBlob(resizedBlob);
+          setIsLoading(false);
+        };
+        reader.readAsDataURL(resizedBlob);
+      } catch (err) {
+        console.error("Image processing error:", err);
+        setError("Не вдалося обробити зображення. Будь ласка, спробуйте інше.");
+        setIsLoading(false);
+      }
     }
   };
 
@@ -71,7 +131,7 @@ JSON об'єкт повинен мати такі поля: 'crop' (назва �
           parts: [
             {
               inlineData: {
-                mimeType: imageBlob.type,
+                mimeType: 'image/jpeg',
                 data: base64Data,
               },
             },
@@ -117,7 +177,7 @@ JSON об'єкт повинен мати такі поля: 'crop' (назва �
     <div className="bg-white p-6 sm:p-8 rounded-xl shadow-lg animate-fade-in">
       <h2 className="text-2xl md:text-3xl font-bold text-gray-800 mb-6 text-center">Визначити проблему за фото</h2>
       
-      {!imageSrc && (
+      {!imageSrc && !isLoading && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
             <input type="file" accept="image/*" ref={cameraInputRef} onChange={handleFileChange} capture="environment" className="hidden" />
             <button onClick={() => cameraInputRef.current?.click()} className="p-8 rounded-lg border-2 border-dashed border-gray-300 hover:border-green-500 hover:bg-green-50 transition-colors flex flex-col items-center justify-center">
@@ -142,7 +202,7 @@ JSON об'єкт повинен мати такі поля: 'crop' (назва �
                     <button onClick={handleIdentify} disabled={isLoading} className="bg-green-600 text-white font-bold py-3 px-8 rounded-lg hover:bg-green-700 transition-colors shadow-lg disabled:bg-gray-400 disabled:cursor-wait">
                         {isLoading ? 'Аналіз...' : 'Аналізувати'}
                     </button>
-                     <button onClick={reset} className="ml-4 bg-gray-200 text-gray-700 font-bold py-3 px-8 rounded-lg hover:bg-gray-300 transition-colors">
+                     <button onClick={reset} disabled={isLoading} className="ml-4 bg-gray-200 text-gray-700 font-bold py-3 px-8 rounded-lg hover:bg-gray-300 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed">
                         Обрати інше
                     </button>
                 </div>
@@ -150,7 +210,7 @@ JSON об'єкт повинен мати такі поля: 'crop' (назва �
         </div>
       )}
       
-      {isLoading && <div className="text-center py-4">Обробка зображення, зачекайте...</div>}
+      {isLoading && <div className="text-center py-4">{!imageSrc ? 'Обробка фото...' : 'Аналіз...'}</div>}
       {error && <div className="text-center py-4 text-red-600 bg-red-50 p-3 rounded-lg">{error}</div>}
 
       {result && (
