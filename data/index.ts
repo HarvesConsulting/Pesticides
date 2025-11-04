@@ -1218,4 +1218,19 @@ export const cropData: CropData = {
     fungicides: celeryFungicides,
     insecticides: celeryInsecticides,
   },
+  [CropType.Leek]: {
+    herbicides: [],
+    fungicides: [],
+    insecticides: [],
+  },
+  [CropType.Daikon]: {
+    herbicides: [],
+    fungicides: [],
+    insecticides: [],
+  },
+  [CropType.Garlic]: {
+    herbicides: [],
+    fungicides: [],
+    insecticides: [],
+  },
 };

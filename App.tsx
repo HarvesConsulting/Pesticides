@@ -362,6 +362,9 @@ const App: React.FC = () => {
     [CropType.Eggplant]: 'баклажанів',
     [CropType.Beet]: 'буряків',
     [CropType.Celery]: 'селери',
+    [CropType.Leek]: 'цибулі-порей',
+    [CropType.Daikon]: 'дайкону',
+    [CropType.Garlic]: 'часнику',
   };
 
   const problemNameMap = {

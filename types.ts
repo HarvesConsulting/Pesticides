@@ -8,6 +8,9 @@ export enum CropType {
   Eggplant = 'Eggplant',
   Beet = 'Beet',
   Celery = 'Celery',
+  Leek = 'Leek',
+  Daikon = 'Daikon',
+  Garlic = 'Garlic',
 }
 
 export enum ProblemType {
