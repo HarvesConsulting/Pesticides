@@ -140,6 +140,8 @@ const App: React.FC = () => {
 
     const isFungicide = (p: Product): p is Fungicide => 'category' in p;
     const isInsecticide = (p: Product): p is Insecticide => !('category' in p);
+    
+    const isLepidopteraControl = (p: Product): p is Insecticide => isInsecticide(p) && p.controls.lepidoptera;
 
     const isRidomilGoldR = (p: Product): boolean => p.productName === 'Ридоміл Голд Р';
     const isBannedContactProduct = (p: Product): boolean => {
@@ -223,6 +225,7 @@ const App: React.FC = () => {
         const addProduct = (product: Product): boolean => {
             if (treatmentProducts.length >= 4) return false;
             treatmentProducts.push(product);
+            // FIX: Corrected variable 'p' to 'product' to reference the function parameter.
             const key = `${product.productName}|${product.activeIngredient}`;
             usageCount.set(key, (usageCount.get(key) ?? 0) + 1);
             updateTargets(product);
@@ -247,7 +250,8 @@ const App: React.FC = () => {
                 greedyPool.forEach((p, index) => {
                     if ((isFungicide(p) && treatmentProducts.length === 0 && p.category === 3) ||
                         hasRedundantOverlap(p, treatmentProducts) ||
-                        wouldBeInvalidMix(p, treatmentProducts)) {
+                        wouldBeInvalidMix(p, treatmentProducts) ||
+                        (isLepidopteraControl(p) && treatmentProducts.some(isLepidopteraControl))) {
                         return;
                     }
 
@@ -288,6 +292,7 @@ const App: React.FC = () => {
                 const isTargetMatch = (p: Product) => {
                     if (target === 'phytophthora') return isFungicide(p) && p.controls.phytophthora;
                     if (target === 'rots') return isFungicide(p) && p.controls.rots;
+                    if (target === 'bacteriosis') return isFungicide(p) && p.controls.bacteriosis;
                     if (target === 'lepidoptera') return isInsecticide(p) && p.controls.lepidoptera;
                     if (target === 'coleoptera') return isInsecticide(p) && p.controls.coleoptera;
                     if (target === 'sucking') return isInsecticide(p) && (p.controls.aphids || p.controls.thrips || p.controls.whiteflies || p.controls.mites);
@@ -297,13 +302,14 @@ const App: React.FC = () => {
                 const isTop = (p: Product) => (isFungicide(p) && topProducts.fungicides.has(p.productName)) || (isInsecticide(p) && topProducts.insecticides.has(p.productName));
 
                 const pool = initialProductsPoolForTurn.filter(p => !treatmentProducts.includes(p));
-                let candidate = pool.find(p => isTargetMatch(p) && isTop(p) && !wouldBeInvalidMix(p, treatmentProducts) && !hasRedundantOverlap(p, treatmentProducts)) ||
-                                pool.find(p => isTargetMatch(p) && !wouldBeInvalidMix(p, treatmentProducts) && !hasRedundantOverlap(p, treatmentProducts));
+                let candidate = pool.find(p => isTargetMatch(p) && isTop(p) && !wouldBeInvalidMix(p, treatmentProducts) && !hasRedundantOverlap(p, treatmentProducts) && !(isLepidopteraControl(p) && treatmentProducts.some(isLepidopteraControl))) ||
+                                pool.find(p => isTargetMatch(p) && !wouldBeInvalidMix(p, treatmentProducts) && !hasRedundantOverlap(p, treatmentProducts) && !(isLepidopteraControl(p) && treatmentProducts.some(isLepidopteraControl)));
 
                 if (candidate) addProduct(candidate);
             };
             findAndAdd('phytophthora');
             findAndAdd('rots');
+            findAndAdd('bacteriosis');
             findAndAdd('lepidoptera');
             findAndAdd('coleoptera');
             findAndAdd('sucking');
@@ -320,7 +326,8 @@ const App: React.FC = () => {
                         !lastTreatmentProductKeys.has(`${p.productName}|${p.activeIngredient}`)
                     );
                     if (candidate) {
-                        if (!wouldBeInvalidMix(candidate, treatmentProducts)) {
+                        if (!wouldBeInvalidMix(candidate, treatmentProducts) &&
+                            !(isLepidopteraControl(candidate) && treatmentProducts.some(isLepidopteraControl))) {
                             productToAdd = candidate;
                             break;
                         }
@@ -330,12 +337,12 @@ const App: React.FC = () => {
             }
         };
 
-        postCheckAndFix('bacteriosis', ['Казумін 2Л', 'Серенада'], allProducts);
+        postCheckAndFix('bacteriosis', ['Казумін 2Л', 'Серенада', 'Медян Екстра', 'Косайд 2000', 'Чемпіон'], allProducts);
         postCheckAndFix('coleoptera', ['Моспілан', 'Актара', 'Децис', 'Карате Зеон'], allProducts);
         postCheckAndFix('lepidoptera', ['Белт', 'Радіант', 'Проклейм', 'Ампліго', 'Кораген'], allProducts);
 
         const allPossibleTargets = ['phytophthora', 'rots', 'bacteriosis', 'lepidoptera', 'coleoptera', 'sucking'];
-        const uncoveredTargets = allPossibleTargets.filter(t => targets[t]);
+        const uncoveredTargets = allPossibleTargets.filter(t => targets[t as keyof typeof targets]);
         plan.push({ treatmentNumber, products: treatmentProducts, uncoveredTargets });
 
         lastTreatmentProductKeys.clear();
