@@ -1071,6 +1071,7 @@ const beetFungicides: Fungicide[] = [
     { activeIngredient: 'міді гідроксид', productName: 'Косайд 2000', category: 1, controls: { bacteriosis: true, phytophthora: true, rots: true, rootRots: false }, rateHome: '6 г/10л', rateField: '2,5 кг/га' },
     { activeIngredient: 'пікоксистробін + ципроконазол', productName: 'Аканто Плюс', category: 2, controls: { bacteriosis: false, phytophthora: false, rots: true, rootRots: false }, rateHome: null, rateField: '0,75 л/га' },
     { activeIngredient: 'флутріафол + карбендазим', productName: 'Імпакт К', category: 2, controls: { bacteriosis: false, phytophthora: false, rots: true, rootRots: false }, rateHome: null, rateField: '0,8 л/га' },
+    { activeIngredient: 'флутріафол', productName: 'Імпакт', category: 2, controls: { bacteriosis: false, phytophthora: false, rots: true, rootRots: false }, rateHome: null, rateField: '0,25-0,5 л/га' },
     { activeIngredient: 'піраклостробін + епоксиконазол', productName: 'Абакус', category: 2, controls: { bacteriosis: false, phytophthora: false, rots: true, rootRots: false }, rateHome: null, rateField: '1,5 л/га' },
     { activeIngredient: 'ципроконазол', productName: 'Альто 400 SC', category: 2, controls: { bacteriosis: false, phytophthora: false, rots: true, rootRots: false }, rateHome: null, rateField: '0,5 л/га' },
     { activeIngredient: 'ципроконазол + пропіконазол', productName: 'Альто Супер 330 ЕС', category: 2, controls: { bacteriosis: false, phytophthora: false, rots: true, rootRots: false }, rateHome: null, rateField: '0,5-0,75 л/га' },

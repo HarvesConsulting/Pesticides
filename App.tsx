@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { ProblemType, CropType, Fungicide, Insecticide, PlotType, IdentificationResult } from './types';
 import Header from './components/Header';
