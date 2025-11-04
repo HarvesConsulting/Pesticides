@@ -1,4 +1,3 @@
-
 import React, { useState, useRef } from 'react';
 import { GoogleGenAI, Type } from "@google/genai";
 import { CropType, IdentificationResult } from '../types';
@@ -114,6 +113,8 @@ const ProblemIdentifier: React.FC<ProblemIdentifierProps> = ({ cropNameMap, onBa
         setError(err.message || "Не вдалося обробити зображення. Будь ласка, спробуйте інше.");
       } finally {
         setIsLoading(false);
+        // Reset the input value to allow selecting the same file again or re-triggering the camera
+        event.target.value = '';
       }
     }
   };
