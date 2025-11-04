@@ -106,10 +106,10 @@ const LandingPage: React.FC = () => {
   ];
 
   return (
-    <div>
+    <div className="container mx-auto px-4 py-12">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {cards.map((card, index) => (
-                <div key={card.title} className="animate-fade-in-up" style={{ animationDelay: `${index * 100 + 300}ms` }}>
+                <div key={card.title} className="animate-fade-in-up" style={{ animationDelay: `${index * 100}ms` }}>
                     <ProductCard {...card} />
                 </div>
             ))}

@@ -63,8 +63,7 @@ interface ProblemIdentifierProps {
 const ProblemIdentifier: React.FC<ProblemIdentifierProps> = ({ onImageReady }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [inputKey, setInputKey] = useState<string>(`key-${Date.now()}`);
-
+  
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileTrigger = (useCamera: boolean) => {
@@ -81,7 +80,10 @@ const ProblemIdentifier: React.FC<ProblemIdentifierProps> = ({ onImageReady }) =
   };
 
   const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
+    // Reset the input value to allow re-selecting the same file
+    const input = event.target;
+    const file = input.files?.[0];
+    
     if (file) {
       setIsLoading(true);
       setError(null);
@@ -89,21 +91,20 @@ const ProblemIdentifier: React.FC<ProblemIdentifierProps> = ({ onImageReady }) =
       try {
         const { blob, url } = await compressImage(file);
         onImageReady(blob, url);
-        // Page will reload, so no need to set isLoading to false
+        // The parent component will handle the loading state from here
       } catch (err: any) {
         console.error("Помилка обробки зображення:", err);
         setError('Не вдалося обробити зображення. Спробуйте інше фото.');
         setIsLoading(false);
-        setInputKey(`key-error-${Date.now()}`);
       }
     }
-    setInputKey(`key-change-${Date.now()}`);
+    // Clear the value to ensure onChange fires again for the same file.
+    input.value = '';
   };
   
   const handleResetError = () => {
     setError(null);
     setIsLoading(false);
-    setInputKey(`key-reset-${Date.now()}`);
   }
 
   return (
@@ -111,7 +112,6 @@ const ProblemIdentifier: React.FC<ProblemIdentifierProps> = ({ onImageReady }) =
       <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-800 mb-4 sm:mb-6 text-center">Визначити проблему за фото</h2>
       
       <input 
-        key={inputKey}
         type="file" 
         accept="image/*" 
         ref={fileInputRef} 
@@ -122,7 +122,7 @@ const ProblemIdentifier: React.FC<ProblemIdentifierProps> = ({ onImageReady }) =
       {isLoading ? (
         <div className="text-center py-6 sm:py-8">
           <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-green-600"></div>
-          <p className="mt-2 text-gray-600">Обробка фото та перезавантаження...</p>
+          <p className="mt-2 text-gray-600">Обробка фото...</p>
         </div>
       ) : error ? (
          <div className="text-center py-4 text-red-600 bg-red-50 p-3 rounded-lg border border-red-200 mt-4">
