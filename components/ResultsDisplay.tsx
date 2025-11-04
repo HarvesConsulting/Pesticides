@@ -1,4 +1,3 @@
-
 import React, { useState, useMemo } from 'react';
 import { ProblemType, CropType, PlotType } from '../types';
 import { cropData } from '../data';
@@ -108,7 +107,7 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ problemType, cropType, 
       );
       break;
     case ProblemType.Diseases:
-      title = "Рекомендовані Фунгіциди";
+      title = null;
       content = (
         <>
           <FilterControls options={fungicideOptions} activeFilters={fungicideFilters} onFilterChange={handleFungicideFilterChange} />
@@ -123,7 +122,7 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ problemType, cropType, 
       );
       break;
     case ProblemType.Pests:
-      title = "Рекомендовані Інсектициди";
+      title = null;
       content = (
         <>
           <FilterControls options={insecticideOptions} activeFilters={insecticideFilters} onFilterChange={handleInsecticideFilterChange} />
@@ -141,7 +140,7 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ problemType, cropType, 
       title = null;
       content = integratedSystemPlan ? (
         <>
-          <p className="text-center text-gray-600 mb-4 text-sm">
+          <p className="text-left text-gray-600 mb-4 text-sm">
             <strong>Примітка:</strong> інтервал між обробками в середньому 7–10 днів.
           </p>
           <IntegratedSystemTable plan={integratedSystemPlan} plotType={plotType} />
