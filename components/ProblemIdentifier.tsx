@@ -67,7 +67,7 @@ const ProblemIdentifier: React.FC<ProblemIdentifierProps> = ({ cropNameMap, onBa
         const options = {
           maxSizeMB: 1,
           maxWidthOrHeight: 1024,
-          useWebWorker: true
+          useWebWorker: false, // Use main thread for better compatibility on all devices
         }
         
         const compressedFile = await imageCompression(file, options);
@@ -77,8 +77,9 @@ const ProblemIdentifier: React.FC<ProblemIdentifierProps> = ({ cropNameMap, onBa
         setImageSrc(previewUrl);
         setImageBase64(base64Data);
       } catch (err: any) {
-        console.error("Помилка обробки зображення:", err);
-        setError(err.message || "Не вдалося обробити зображення. Будь ласка, спробуйте інше.");
+        console.error("Повна помилка обробки зображення:", err);
+        const errorMessage = `Помилка обробки зображення: ${err.name} - ${err.message}. Спробуйте інше фото або перезавантажте сторінку.`;
+        setError(errorMessage);
       } finally {
         setIsLoading(false);
       }
