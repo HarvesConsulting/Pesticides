@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { CropType, IdentificationResult } from '../types';
 import ProblemIdentifier from './ProblemIdentifier';
@@ -16,7 +15,6 @@ const StandaloneIdentifierPage: React.FC<StandaloneIdentifierPageProps> = ({ cro
         <BackButton onClick={onBackToLanding} />
         <ProblemIdentifier 
             cropNameMap={cropNameMap}
-            onBackToLanding={onBackToLanding}
             onIdentificationComplete={onIdentificationComplete}
         />
     </div>
