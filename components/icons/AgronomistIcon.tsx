@@ -1,4 +1,3 @@
-// FIX: Create AgronomistIcon component content to be used in the LandingPage.
 import React from 'react';
 
 export const AgronomistIcon: React.FC = () => (

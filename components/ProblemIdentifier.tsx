@@ -33,8 +33,8 @@ const resizeImage = (file: File): Promise<Blob> => {
     img.onload = () => {
       URL.revokeObjectURL(url); 
       const canvas = document.createElement('canvas');
-      const MAX_WIDTH = 400; // Further reduced for mobile performance
-      const MAX_HEIGHT = 400; // Further reduced for mobile performance
+      const MAX_WIDTH = 300; // Even more aggressive reduction for mobile
+      const MAX_HEIGHT = 300; // Even more aggressive reduction for mobile
       let width = img.width;
       let height = img.height;
 
@@ -65,7 +65,7 @@ const resizeImage = (file: File): Promise<Blob> => {
           }
         },
         'image/jpeg',
-        0.8 // Further reduced quality
+        0.75 // Slightly lower quality
       );
     };
     img.onerror = (err) => {
@@ -79,7 +79,7 @@ const resizeImage = (file: File): Promise<Blob> => {
 
 const ProblemIdentifier: React.FC<ProblemIdentifierProps> = ({ cropNameMap, onBackToLanding, onIdentificationComplete }) => {
   const [imageSrc, setImageSrc] = useState<string | null>(null);
-  const [imageBlob, setImageBlob] = useState<Blob | null>(null);
+  const [imageBase64, setImageBase64] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<IdentificationResult | null>(null);
@@ -93,42 +93,45 @@ const ProblemIdentifier: React.FC<ProblemIdentifierProps> = ({ cropNameMap, onBa
       setIsLoading(true);
       setError(null);
       setResult(null);
+      
+      // Clean up previous image if it was a blob URL
+      if (imageSrc && imageSrc.startsWith('blob:')) {
+          URL.revokeObjectURL(imageSrc);
+      }
       setImageSrc(null);
-      setImageBlob(null);
+      setImageBase64(null);
+
       try {
         const resizedBlob = await resizeImage(file);
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          setImageSrc(e.target?.result as string);
-          setImageBlob(resizedBlob);
-          setIsLoading(false);
-        };
-        reader.onerror = () => {
-            throw new Error("Не вдалося прочитати оброблене зображення.");
-        }
-        reader.readAsDataURL(resizedBlob);
+        const base64Data = await blobToBase64(resizedBlob);
+        const previewUrl = URL.createObjectURL(resizedBlob);
+        
+        setImageSrc(previewUrl);
+        setImageBase64(base64Data);
       } catch (err: any) {
         console.error("Помилка обробки зображення:", err);
         setError(err.message || "Не вдалося обробити зображення. Будь ласка, спробуйте інше.");
+      } finally {
         setIsLoading(false);
       }
     }
   };
 
   const handleIdentify = async () => {
-    if (!imageBlob) return;
+    if (!imageBase64) return;
     setIsLoading(true);
     setError(null);
     setResult(null);
 
     try {
-      const base64Data = await blobToBase64(imageBlob);
       const ai = new GoogleGenAI({ apiKey: process.env.API_KEY as string });
 
       const cropList = Object.values(CropType).join(', ');
-      const promptText = `Проаналізуй це зображення. Ідентифікуй культуру, а також будь-яку хворобу або шкідника.
+      const promptText = `Проаналізуй це зображення та надай відповідь ВИКЛЮЧНО УКРАЇНСЬКОЮ МОВОЮ. Ідентифікуй культуру, а також будь-яку хворобу або шкідника.
 - У полі 'crop' використовуй значення з цього списку: [${cropList}], або 'unknown', якщо культура не зі списку.
+- У полі 'name' напиши назву хвороби/шкідника українською.
 - У полі 'type' використовуй 'disease', 'pest', або 'unknown'.
+- У полі 'description' надай детальний опис українською.
 - Надай відповідь виключно у форматі JSON згідно зі схемою.`;
 
       const response = await ai.models.generateContent({
@@ -138,7 +141,7 @@ const ProblemIdentifier: React.FC<ProblemIdentifierProps> = ({ cropNameMap, onBa
             {
               inlineData: {
                 mimeType: 'image/jpeg',
-                data: base64Data,
+                data: imageBase64,
               },
             },
             { text: promptText },
@@ -173,8 +176,11 @@ const ProblemIdentifier: React.FC<ProblemIdentifierProps> = ({ cropNameMap, onBa
   };
   
   const reset = () => {
+    if (imageSrc && imageSrc.startsWith('blob:')) {
+        URL.revokeObjectURL(imageSrc);
+    }
     setImageSrc(null);
-    setImageBlob(null);
+    setImageBase64(null);
     setResult(null);
     setError(null);
   }
@@ -198,6 +204,8 @@ const ProblemIdentifier: React.FC<ProblemIdentifierProps> = ({ cropNameMap, onBa
         </div>
       )}
 
+      {isLoading && !imageSrc && <div className="text-center py-4">Обробка фото...</div>}
+      
       {imageSrc && (
         <div className="space-y-6">
             <div className="w-full max-w-sm mx-auto">
@@ -216,7 +224,7 @@ const ProblemIdentifier: React.FC<ProblemIdentifierProps> = ({ cropNameMap, onBa
         </div>
       )}
       
-      {isLoading && <div className="text-center py-4">{!imageSrc ? 'Обробка фото...' : 'Аналіз...'}</div>}
+      {isLoading && imageSrc && <div className="text-center py-4">Аналіз...</div>}
       {error && <div className="text-center py-4 text-red-600 bg-red-50 p-3 rounded-lg">{error}</div>}
 
       {result && (

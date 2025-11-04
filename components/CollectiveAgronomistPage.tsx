@@ -1,4 +1,3 @@
-// FIX: Create content for CollectiveAgronomistPage.tsx to resolve "cannot find name" errors.
 import React, { useState, useMemo } from 'react';
 import { CropType, PlotType, ProblemType, Fungicide, Insecticide, IdentificationResult } from '../types';
 import { cropData } from '../data';
