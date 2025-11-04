@@ -4,12 +4,6 @@ import { CropType, IdentificationResult } from '../types';
 import { CameraIcon } from './icons/CameraIcon';
 import { UploadIcon } from './icons/UploadIcon';
 
-interface ProblemIdentifierProps {
-  cropNameMap: Record<CropType, string>;
-  onBackToLanding: () => void;
-  onIdentificationComplete: (result: IdentificationResult) => void;
-}
-
 const blobToBase64 = (blob: Blob): Promise<string> => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -25,26 +19,37 @@ const blobToBase64 = (blob: Blob): Promise<string> => {
   });
 };
 
-// Функція для стиснення зображення без використання бібліотеки
+// Власна надійна функція для стиснення зображення
 const compressImage = (file: File, maxWidth = 1024, quality = 0.8): Promise<Blob> => {
   return new Promise((resolve, reject) => {
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d');
+    if (!ctx) {
+      return reject(new Error('Could not get canvas context'));
+    }
+
     const img = new Image();
     
     img.onload = () => {
+      URL.revokeObjectURL(img.src); // Звільнення пам'яті
       let { width, height } = img;
       
-      // Зменшуємо розмір якщо потрібно
-      if (width > maxWidth) {
-        height = (height * maxWidth) / width;
-        width = maxWidth;
+      if (width > height) {
+        if (width > maxWidth) {
+          height = Math.round((height * maxWidth) / width);
+          width = maxWidth;
+        }
+      } else {
+        if (height > maxWidth) {
+          width = Math.round((width * maxWidth) / height);
+          height = maxWidth;
+        }
       }
       
       canvas.width = width;
       canvas.height = height;
       
-      ctx?.drawImage(img, 0, 0, width, height);
+      ctx.drawImage(img, 0, 0, width, height);
       
       canvas.toBlob(
         (blob) => {
@@ -59,10 +64,20 @@ const compressImage = (file: File, maxWidth = 1024, quality = 0.8): Promise<Blob
       );
     };
     
-    img.onerror = () => reject(new Error('Image loading failed'));
+    img.onerror = (err) => {
+        URL.revokeObjectURL(img.src); // Звільнення пам'яті при помилці
+        reject(new Error('Image loading failed'));
+    };
     img.src = URL.createObjectURL(file);
   });
 };
+
+// FIX: Define props interface for ProblemIdentifier component
+interface ProblemIdentifierProps {
+  cropNameMap: Record<CropType, string>;
+  onBackToLanding: () => void;
+  onIdentificationComplete: (result: IdentificationResult) => void;
+}
 
 const ProblemIdentifier: React.FC<ProblemIdentifierProps> = ({ cropNameMap, onBackToLanding, onIdentificationComplete }) => {
   const [imageSrc, setImageSrc] = useState<string | null>(null);
@@ -74,32 +89,25 @@ const ProblemIdentifier: React.FC<ProblemIdentifierProps> = ({ cropNameMap, onBa
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Перевірка підтримки браузером
   useEffect(() => {
-    if (!window.FileReader) {
-      setError('Ваш браузер не підтримує завантаження файлів. Будь ласка, оновіть браузер.');
-    }
-  }, []);
+    // Очищення blob URL при розмонтуванні компонента
+    return () => {
+      if (imageSrc && imageSrc.startsWith('blob:')) {
+          URL.revokeObjectURL(imageSrc);
+      }
+    };
+  }, [imageSrc]);
 
   const handleFileTrigger = (useCamera: boolean) => {
     const input = fileInputRef.current;
     if (input) {
-        // Очищаємо попередні файли
         input.value = '';
-        
         if (useCamera) {
-            // Для мобільних пристроїв
             input.setAttribute('capture', 'environment');
-            input.setAttribute('accept', 'image/*');
         } else {
             input.removeAttribute('capture');
-            input.setAttribute('accept', 'image/*');
         }
-        
-        // Затримка для iOS
-        setTimeout(() => {
-            input.click();
-        }, 100);
+        input.click();
     }
   };
 
@@ -112,7 +120,6 @@ const ProblemIdentifier: React.FC<ProblemIdentifierProps> = ({ cropNameMap, onBa
       setError(null);
       setResult(null);
       
-      // Очищення попередніх URL
       if (imageSrc && imageSrc.startsWith('blob:')) {
           URL.revokeObjectURL(imageSrc);
       }
@@ -120,43 +127,15 @@ const ProblemIdentifier: React.FC<ProblemIdentifierProps> = ({ cropNameMap, onBa
       setImageBase64(null);
 
       try {
-        // Перевірка розміру файлу
-        if (file.size > 10 * 1024 * 1024) { // 10MB
-          setError('Файл занадто великий. Максимальний розмір: 10MB');
-          setIsLoading(false);
-          return;
-        }
-
-        // Спрощена обробка з базовим стисненням
-        let processedBlob: Blob;
-        
-        if (file.type.startsWith('image/') && !file.type.includes('gif')) {
-          try {
-            processedBlob = await compressImage(file, 1024, 0.7);
-          } catch (compressError) {
-            console.warn('Compression failed, using original file:', compressError);
-            processedBlob = file;
-          }
-        } else {
-          processedBlob = file;
-        }
-
-        const base64Data = await blobToBase64(processedBlob);
-        const previewUrl = URL.createObjectURL(processedBlob);
+        const compressedBlob = await compressImage(file);
+        const base64Data = await blobToBase64(compressedBlob);
+        const previewUrl = URL.createObjectURL(compressedBlob);
         
         setImageSrc(previewUrl);
         setImageBase64(base64Data);
       } catch (err: any) {
         console.error("Помилка обробки зображення:", err);
-        let errorMessage = 'Помилка обробки зображення. Спробуйте інше фото.';
-        
-        if (err.name === 'SecurityError') {
-          errorMessage = 'Помилка безпеки при обробці зображення. Спробуйте інше фото.';
-        } else if (err.name === 'EncodingError') {
-          errorMessage = 'Формат зображення не підтримується. Спробуйте JPG або PNG.';
-        }
-        
-        setError(errorMessage);
+        setError('Не вдалося обробити зображення. Спробуйте інше фото.');
       } finally {
         setIsLoading(false);
       }
@@ -165,17 +144,16 @@ const ProblemIdentifier: React.FC<ProblemIdentifierProps> = ({ cropNameMap, onBa
 
   const handleIdentify = async () => {
     if (!imageBase64) return;
-    
-    // Перевірка API ключа
-    if (!process.env.API_KEY) {
-      setError('Помилка конфігурації: API ключ не налаштовано');
-      return;
-    }
 
     setIsLoading(true);
     setError(null);
 
     try {
+      // Перевірка API ключа перенесена всередину try-catch
+      if (!process.env.API_KEY) {
+        throw new Error('API_KEY is not available');
+      }
+
       const ai = new GoogleGenAI({ 
         apiKey: process.env.API_KEY as string 
       });
@@ -226,10 +204,10 @@ const ProblemIdentifier: React.FC<ProblemIdentifierProps> = ({ cropNameMap, onBa
       let userMessage = 'Помилка аналізу. Перевірте підключення до інтернету та спробуйте ще раз.';
       
       if (err instanceof Error) {
-        if (err.message.includes('SAFETY')) {
+        if (err.message.includes('API_KEY')) {
+          userMessage = 'Помилка конфігурації. Не вдалося отримати доступ до API ключа. Спробуйте оновити сторінку.';
+        } else if (err.message.includes('SAFETY')) {
           userMessage = 'Зображення не пройшло перевірку безпеки. Спробуйте інше фото.';
-        } else if (err.message.includes('API_KEY') || err.message.includes('apiKey')) {
-          userMessage = 'Проблема з API ключем. Зверніться до адміністратора.';
         } else if (err.message.includes('network') || err.message.includes('Network')) {
           userMessage = 'Проблема з мережевим зʼєднанням. Перевірте інтернет.';
         } else if (err.message.includes('quota') || err.message.includes('Quota')) {
