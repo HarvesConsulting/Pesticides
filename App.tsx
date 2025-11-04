@@ -62,10 +62,22 @@ const App: React.FC = () => {
   };
 
   const handleStartAnalysis = async (blob: Blob): Promise<IdentificationResult | null> => {
+    console.log('[App] handleStartAnalysis triggered.');
     try {
-        const ai = new GoogleGenAI({ apiKey: process.env.API_KEY as string });
+        const apiKey = process.env.API_KEY as string;
+        console.log('[App] Checking for API key. Available:', !!apiKey);
+
+        if (!apiKey) {
+            console.error('[App] API key is missing or not configured.');
+            throw new Error("API key not configured");
+        }
         
+        const ai = new GoogleGenAI({ apiKey });
+        console.log('[App] GoogleGenAI client initialized.');
+        
+        console.log('[App] Converting blob to base64...');
         const base64data = await blobToBase64(blob);
+        console.log('[App] Blob converted to base64 successfully.');
 
         const imagePart = {
             inlineData: {
@@ -93,6 +105,7 @@ const App: React.FC = () => {
             }
         `;
         
+        console.log('[App] Sending request to Gemini API...');
         const response = await ai.models.generateContent({
             model: 'gemini-2.5-flash',
             contents: { parts: [imagePart, { text: prompt }] },
@@ -111,12 +124,16 @@ const App: React.FC = () => {
                 }
             }
         });
+        console.log('[App] Received response from Gemini API.');
+
 
         const jsonText = response.text.trim();
+        console.log('[App] Parsing API response JSON.');
         const parsedResult = JSON.parse(jsonText) as IdentificationResult;
+        console.log('[App] API response parsed successfully:', parsedResult);
         return parsedResult;
     } catch (err) {
-        console.error("AI identification failed in App.tsx:", err);
+        console.error("[App] AI identification failed in handleStartAnalysis:", err);
         return null;
     }
   };

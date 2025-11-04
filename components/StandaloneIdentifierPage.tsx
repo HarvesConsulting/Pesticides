@@ -51,16 +51,21 @@ const StandaloneIdentifierPage: React.FC<StandaloneIdentifierPageProps> = ({ onB
   }
 
   const handleImageReady = async (blob: Blob, url: string) => {
+    console.log('[StandaloneIdentifierPage] handleImageReady triggered.');
     setIsLoading(true);
     setError(null);
     setResult(null);
     setImage({ url });
 
+    console.log('[StandaloneIdentifierPage] Calling onStartAnalysis prop...');
     const analysisResult = await onStartAnalysis(blob);
+    console.log('[StandaloneIdentifierPage] onStartAnalysis prop returned.');
 
     if (analysisResult) {
+        console.log('[StandaloneIdentifierPage] Analysis successful. Result:', analysisResult);
         setResult(analysisResult);
     } else {
+        console.error("[StandaloneIdentifierPage] Analysis failed, result is null.");
         setError("Не вдалося розпізнати проблему. Можливо, проблема з API ключем або мережею. Спробуйте зробити більш чітке фото або завантажити інше.");
     }
     setIsLoading(false);

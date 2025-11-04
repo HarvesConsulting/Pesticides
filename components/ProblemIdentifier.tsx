@@ -3,10 +3,12 @@ import { CameraIcon } from './icons/CameraIcon';
 import { UploadIcon } from './icons/UploadIcon';
 
 const compressImage = (file: File, maxWidth = 1024, quality = 0.8): Promise<{blob: Blob, url: string}> => {
+  console.log('[compressImage] Starting compression for file:', file.name, 'size:', file.size);
   return new Promise((resolve, reject) => {
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d');
     if (!ctx) {
+      console.error('[compressImage] Could not get canvas context.');
       return reject(new Error('Could not get canvas context'));
     }
 
@@ -14,6 +16,7 @@ const compressImage = (file: File, maxWidth = 1024, quality = 0.8): Promise<{blo
     
     img.onload = () => {
       URL.revokeObjectURL(img.src);
+      console.log('[compressImage] Image loaded successfully. Original dimensions:', img.width, 'x', img.height);
       let { width, height } = img;
       
       if (width > height) {
@@ -28,6 +31,7 @@ const compressImage = (file: File, maxWidth = 1024, quality = 0.8): Promise<{blo
         }
       }
       
+      console.log('[compressImage] Resizing to max dimension:', maxWidth, 'New dimensions:', width, 'x', height);
       canvas.width = width;
       canvas.height = height;
       
@@ -37,8 +41,10 @@ const compressImage = (file: File, maxWidth = 1024, quality = 0.8): Promise<{blo
       canvas.toBlob(
         (blob) => {
           if (blob) {
+            console.log('[compressImage] Compression to blob successful. New size:', blob.size);
             resolve({blob, url: dataUrl});
           } else {
+            console.error('[compressImage] Canvas toBlob failed.');
             reject(new Error('Canvas toBlob failed'));
           }
         },
@@ -47,11 +53,13 @@ const compressImage = (file: File, maxWidth = 1024, quality = 0.8): Promise<{blo
       );
     };
     
-    img.onerror = () => {
+    img.onerror = (err) => {
         URL.revokeObjectURL(img.src);
+        console.error('[compressImage] Image loading failed:', err);
         reject(new Error('Image loading failed'));
     };
     img.src = URL.createObjectURL(file);
+    console.log('[compressImage] Image source set to object URL.');
   });
 };
 
@@ -80,23 +88,27 @@ const ProblemIdentifier: React.FC<ProblemIdentifierProps> = ({ onImageReady }) =
   };
 
   const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    // Reset the input value to allow re-selecting the same file
+    console.log('[ProblemIdentifier] handleFileChange triggered.');
     const input = event.target;
     const file = input.files?.[0];
     
     if (file) {
+      console.log('[ProblemIdentifier] File selected:', { name: file.name, size: file.size, type: file.type });
       setIsLoading(true);
       setError(null);
 
       try {
         const { blob, url } = await compressImage(file);
+        console.log('[ProblemIdentifier] Image processing complete, calling onImageReady.');
         onImageReady(blob, url);
         // The parent component will handle the loading state from here
       } catch (err: any) {
-        console.error("Помилка обробки зображення:", err);
+        console.error("[ProblemIdentifier] Error processing image:", err);
         setError('Не вдалося обробити зображення. Спробуйте інше фото.');
         setIsLoading(false);
       }
+    } else {
+        console.log('[ProblemIdentifier] No file selected.');
     }
     // Clear the value to ensure onChange fires again for the same file.
     input.value = '';
