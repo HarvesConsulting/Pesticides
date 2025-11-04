@@ -25,37 +25,38 @@ const blobToBase64 = (blob: Blob): Promise<string> => {
   });
 };
 
-const resizeImage = (file: File): Promise<Blob> => {
-  return new Promise((resolve, reject) => {
-    const url = URL.createObjectURL(file);
-    const img = new Image();
-    img.src = url;
-    img.onload = () => {
-      URL.revokeObjectURL(url); 
-      const canvas = document.createElement('canvas');
-      const MAX_WIDTH = 512;
-      const MAX_HEIGHT = 512;
-      let width = img.width;
-      let height = img.height;
+const resizeImage = async (file: File): Promise<Blob> => {
+  try {
+    // Use createImageBitmap for more memory-efficient image handling, crucial for mobile devices.
+    const bitmap = await createImageBitmap(file);
 
-      if (width > height) {
-        if (width > MAX_WIDTH) {
-          height *= MAX_WIDTH / width;
-          width = MAX_WIDTH;
-        }
-      } else {
-        if (height > MAX_HEIGHT) {
-          width *= MAX_HEIGHT / height;
-          height = MAX_HEIGHT;
-        }
+    const MAX_WIDTH = 512;
+    const MAX_HEIGHT = 512;
+    let { width, height } = bitmap;
+
+    if (width > height) {
+      if (width > MAX_WIDTH) {
+        height = Math.round(height * (MAX_WIDTH / width));
+        width = MAX_WIDTH;
       }
-      canvas.width = width;
-      canvas.height = height;
-      const ctx = canvas.getContext('2d');
-      if (!ctx) {
-        return reject(new Error('Could not get canvas context'));
+    } else {
+      if (height > MAX_HEIGHT) {
+        width = Math.round(width * (MAX_HEIGHT / height));
+        height = MAX_HEIGHT;
       }
-      ctx.drawImage(img, 0, 0, width, height);
+    }
+
+    const canvas = document.createElement('canvas');
+    canvas.width = width;
+    canvas.height = height;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) {
+      throw new Error('Could not get canvas context');
+    }
+    ctx.drawImage(bitmap, 0, 0, width, height);
+    bitmap.close(); // Release memory associated with the bitmap
+
+    return new Promise((resolve, reject) => {
       canvas.toBlob(
         (blob) => {
           if (blob) {
@@ -67,13 +68,11 @@ const resizeImage = (file: File): Promise<Blob> => {
         'image/jpeg',
         0.75
       );
-    };
-    img.onerror = (err) => {
-      URL.revokeObjectURL(url);
-      console.error("Image loading failed:", err);
-      reject(new Error("Не вдалося завантажити зображення для обробки."));
-    };
-  });
+    });
+  } catch (error) {
+    console.error("Image processing failed:", error);
+    throw new Error("Не вдалося обробити зображення. Можливо, файл пошкоджено або має непідтримуваний формат.");
+  }
 };
 
 
