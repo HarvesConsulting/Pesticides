@@ -10,6 +10,42 @@ interface ProblemIdentifierProps {
   onIdentificationComplete: (result: IdentificationResult) => void;
 }
 
+const resizeImage = (file: File, maxSize: number): Promise<Blob> => {
+  return new Promise(async (resolve, reject) => {
+    try {
+        const bmp = await createImageBitmap(file, {
+            resizeWidth: maxSize,
+            resizeHeight: maxSize,
+            resizeQuality: 'high',
+        });
+
+        const canvas = document.createElement('canvas');
+        canvas.width = bmp.width;
+        canvas.height = bmp.height;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) {
+            return reject(new Error('Could not get canvas context'));
+        }
+        ctx.drawImage(bmp, 0, 0);
+
+        canvas.toBlob(
+            (blob) => {
+                if (blob) {
+                    resolve(blob);
+                } else {
+                    reject(new Error('Canvas to Blob conversion failed'));
+                }
+            },
+            'image/jpeg',
+            0.9 // 90% quality
+        );
+    } catch (error) {
+        reject(error);
+    }
+  });
+};
+
+
 const blobToBase64 = (blob: Blob): Promise<string> => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -24,57 +60,6 @@ const blobToBase64 = (blob: Blob): Promise<string> => {
     reader.readAsDataURL(blob);
   });
 };
-
-const resizeImage = async (file: File): Promise<Blob> => {
-  try {
-    // Use createImageBitmap for more memory-efficient image handling, crucial for mobile devices.
-    const bitmap = await createImageBitmap(file);
-
-    const MAX_WIDTH = 512;
-    const MAX_HEIGHT = 512;
-    let { width, height } = bitmap;
-
-    if (width > height) {
-      if (width > MAX_WIDTH) {
-        height = Math.round(height * (MAX_WIDTH / width));
-        width = MAX_WIDTH;
-      }
-    } else {
-      if (height > MAX_HEIGHT) {
-        width = Math.round(width * (MAX_HEIGHT / height));
-        height = MAX_HEIGHT;
-      }
-    }
-
-    const canvas = document.createElement('canvas');
-    canvas.width = width;
-    canvas.height = height;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) {
-      throw new Error('Could not get canvas context');
-    }
-    ctx.drawImage(bitmap, 0, 0, width, height);
-    bitmap.close(); // Release memory associated with the bitmap
-
-    return new Promise((resolve, reject) => {
-      canvas.toBlob(
-        (blob) => {
-          if (blob) {
-            resolve(blob);
-          } else {
-            reject(new Error('Canvas to Blob conversion failed'));
-          }
-        },
-        'image/jpeg',
-        0.75
-      );
-    });
-  } catch (error) {
-    console.error("Image processing failed:", error);
-    throw new Error("Не вдалося обробити зображення. Можливо, файл пошкоджено або має непідтримуваний формат.");
-  }
-};
-
 
 const ProblemIdentifier: React.FC<ProblemIdentifierProps> = ({ cropNameMap, onBackToLanding, onIdentificationComplete }) => {
   const [imageSrc, setImageSrc] = useState<string | null>(null);
@@ -99,8 +84,6 @@ const ProblemIdentifier: React.FC<ProblemIdentifierProps> = ({ cropNameMap, onBa
   };
 
   const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    // Force re-mount of the input for the next attempt by changing its key.
-    // This is the most reliable way to handle file inputs on mobile.
     setInputKey(`key-${Date.now()}`);
 
     const file = event.target.files?.[0];
@@ -116,7 +99,7 @@ const ProblemIdentifier: React.FC<ProblemIdentifierProps> = ({ cropNameMap, onBa
       setImageBase64(null);
 
       try {
-        const resizedBlob = await resizeImage(file);
+        const resizedBlob = await resizeImage(file, 1024);
         const base64Data = await blobToBase64(resizedBlob);
         const previewUrl = URL.createObjectURL(resizedBlob);
         

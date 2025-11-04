@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { NewProductIcon } from './icons/NewProductIcon';
 import { ListItemMarkerIcon } from './icons/ListItemMarkerIcon';
@@ -86,8 +85,8 @@ const LandingPage: React.FC = () => {
   const topHerbicides = [
     { name: 'Зенкор' },
     { name: 'Тітус' },
-    { name: 'Дуал Голд' },
-    { name: 'Лонтрел Гранд' },
+    { name: 'Челендж' },
+    { name: 'Фузілад Форте' },
     { name: 'Гезагард' },
   ];
 

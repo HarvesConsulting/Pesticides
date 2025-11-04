@@ -1,4 +1,3 @@
-
 export enum CropType {
   Tomato = 'Tomato',
   Pepper = 'Pepper',
@@ -54,6 +53,7 @@ export interface Fungicide {
   controls: FungicideControls;
   rateHome: string | null;
   rateField: string | null;
+  applicationType?: 'soil';
 }
 
 export interface InsecticideControls {
@@ -71,6 +71,7 @@ export interface Insecticide {
   controls: InsecticideControls;
   rateHome: string | null;
   rateField: string | null;
+  applicationType?: 'soil';
 }
 
 export interface Crop {

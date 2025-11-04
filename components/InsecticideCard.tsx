@@ -1,4 +1,6 @@
-
+// FIX: The original file was incomplete, causing a build error.
+// The component has been fully implemented based on FungicideCard.tsx
+// and now correctly exports as a default component.
 import React from 'react';
 import { Insecticide, PlotType } from '../types';
 
@@ -19,7 +21,6 @@ const XIcon = () => (
     </svg>
 );
 
-
 const InsecticideCard: React.FC<InsecticideCardProps> = ({ insecticide, plotType }) => {
   const controls = [
     { label: 'Тлі', controlled: insecticide.controls.aphids },
@@ -37,12 +38,19 @@ const InsecticideCard: React.FC<InsecticideCardProps> = ({ insecticide, plotType
       <div className="flex flex-col sm:flex-row justify-between sm:items-start">
         <div>
           <h4 className="text-xl font-bold text-red-800">{insecticide.productName}</h4>
-          <p className="text-md text-gray-600 mb-2">{insecticide.activeIngredient}</p>
-          {rate && (
-            <p className="text-sm font-semibold text-gray-800 bg-green-50 px-3 py-1.5 rounded-md inline-block">
-                Норма: <span className="text-green-700 font-bold">{rate}</span>
-            </p>
-          )}
+          <p className="text-md text-gray-600 mb-3">{insecticide.activeIngredient}</p>
+          <div className="flex flex-wrap gap-2 items-center">
+             {rate && (
+              <span className="text-sm font-semibold text-gray-800 bg-gray-100 px-3 py-1.5 rounded-md inline-block">
+                  Норма: <span className="text-green-700 font-bold">{rate}</span>
+              </span>
+             )}
+            {insecticide.applicationType === 'soil' && (
+                <span className="text-sm font-semibold px-3 py-1.5 rounded-md inline-block bg-orange-100 text-orange-800">
+                    Ґрунтовий
+                </span>
+            )}
+          </div>
         </div>
         <div className="mt-4 sm:mt-0 sm:ml-6 grid grid-cols-2 gap-x-6 gap-y-2 text-sm">
           {controls.map(control => (

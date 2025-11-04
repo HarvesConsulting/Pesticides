@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Fungicide, PlotType } from '../types';
 
@@ -46,13 +45,18 @@ const FungicideCard: React.FC<FungicideCardProps> = ({ fungicide, plotType }) =>
           <p className="text-md text-gray-600 mb-3">{fungicide.activeIngredient}</p>
           <div className="flex flex-wrap gap-2 items-center">
              {rate && (
-              <p className="text-sm font-semibold text-gray-800 bg-gray-100 px-3 py-1.5 rounded-md inline-block">
+              <span className="text-sm font-semibold text-gray-800 bg-gray-100 px-3 py-1.5 rounded-md inline-block">
                   Норма: <span className="text-green-700 font-bold">{rate}</span>
-              </p>
+              </span>
              )}
             {category && (
                 <span className={`text-sm font-semibold px-3 py-1.5 rounded-md inline-block ${category.className}`}>
                     {category.label}
+                </span>
+            )}
+            {fungicide.applicationType === 'soil' && (
+                <span className="text-sm font-semibold px-3 py-1.5 rounded-md inline-block bg-orange-100 text-orange-800">
+                    Ґрунтовий
                 </span>
             )}
           </div>

@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { ProblemType, CropType, Fungicide, Insecticide, PlotType, IdentificationResult } from './types';
 import Header from './components/Header';
@@ -123,10 +122,12 @@ const App: React.FC = () => {
     const numTreatments = Math.round((period - 20) / 7);
     if (numTreatments <= 0) return [];
 
-    const availableFungicides = [...cropData[crop].fungicides].filter(p => plotType === 'home' ? p.rateHome !== null : p.rateField !== null);
-    const availableInsecticides = [...cropData[crop].insecticides].filter(p => plotType === 'home' ? p.rateHome !== null : p.rateField !== null).filter(
-        p => p.productName !== 'Регент' && p.productName !== 'Форс'
-    );
+    const availableFungicides = [...cropData[crop].fungicides]
+        .filter(p => plotType === 'home' ? p.rateHome !== null : p.rateField !== null)
+        .filter(p => p.applicationType !== 'soil');
+    const availableInsecticides = [...cropData[crop].insecticides]
+        .filter(p => plotType === 'home' ? p.rateHome !== null : p.rateField !== null)
+        .filter(p => p.applicationType !== 'soil');
 
     const allProducts: Product[] = [...availableFungicides, ...availableInsecticides];
 
@@ -225,7 +226,6 @@ const App: React.FC = () => {
         const addProduct = (product: Product): boolean => {
             if (treatmentProducts.length >= 4) return false;
             treatmentProducts.push(product);
-            // FIX: Corrected variable 'p' to 'product' to reference the function parameter.
             const key = `${product.productName}|${product.activeIngredient}`;
             usageCount.set(key, (usageCount.get(key) ?? 0) + 1);
             updateTargets(product);
