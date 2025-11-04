@@ -1,4 +1,3 @@
-
 import { Herbicide, Fungicide, Insecticide, CropData, CropType } from '../types';
 
 const tomatoHerbicides: Herbicide[] = [
@@ -159,7 +158,7 @@ const tomatoFungicides: Fungicide[] = [
     { activeIngredient: 'мандіпропамід+дифеноконазол', productName: 'Ревус Топ', category: 2, controls: { bacteriosis: false, phytophthora: true, rots: true, rootRots: false }, rateHome: '1,2 мл/10л', rateField: '0,6 л/га' },
     { activeIngredient: 'мандіпропамід+хлорокис міді', productName: 'Пергадо', category: 2, controls: { bacteriosis: true, phytophthora: true, rots: true, rootRots: false }, rateHome: '15 г/10л', rateField: '5 кг/га' },
     { activeIngredient: 'мандіпропамід+цимоксаніл', productName: 'Рекванс Флекс', category: 2, controls: { bacteriosis: false, phytophthora: true, rots: false, rootRots: false }, rateHome: '2 г/10л', rateField: '0,6 кг/га' },
-    { activeIngredient: 'дифеноконазол+цифлуфенамід', productName: 'Циделі Топ', category: 2, controls: { bacteriosis: false, phytophthora: true, rots: true, rootRots: false }, rateHome: '5 мл/10л', rateField: '2 л/га' },
+    { activeIngredient: 'дифеноконазол+цифлуфенамід', productName: 'Циделі Топ', category: 2, controls: { bacteriosis: false, phytophthora: false, rots: true, rootRots: false }, rateHome: '5 мл/10л', rateField: '2 л/га' },
     { activeIngredient: 'іпровалікарб+оксихлорид міді', productName: 'Мелоді Компакт', category: 2, controls: { bacteriosis: true, phytophthora: true, rots: false, rootRots: false }, rateHome: null, rateField: '2 л/га' },
     { activeIngredient: 'флуазинам', productName: 'Банджо', category: 2, controls: { bacteriosis: false, phytophthora: true, rots: true, rootRots: false }, rateHome: '1,2 мл/10л', rateField: '0,4 л/га' },
     { activeIngredient: 'диметоморф+флуазинам', productName: 'Банджо Форте', category: 2, controls: { bacteriosis: false, phytophthora: true, rots: true, rootRots: false }, rateHome: '3,5 мл/10л', rateField: '1 л/га' },
@@ -778,7 +777,7 @@ const pumpkinFungicides: Fungicide[] = [
     { activeIngredient: 'хлорокис міді+цимоксаніл', productName: 'Ордан', category: 1, controls: { bacteriosis: true, phytophthora: true, rots: false, rootRots: false }, rateHome: '5 г/10л', rateField: '1,5 кг/га' },
     { activeIngredient: 'фосетил алюмінію', productName: 'Альєтт', category: 1, controls: { bacteriosis: true, phytophthora: true, rots: true, rootRots: false }, rateHome: '7 г/10л', rateField: '2 кг/га' },
     { activeIngredient: 'цимоксаніл+оксихлорид міді', productName: 'Курзат Р', category: 2, controls: { bacteriosis: true, phytophthora: true, rots: true, rootRots: false }, rateHome: '8,5 г/10л', rateField: '2,5 кг/га' },
-    { activeIngredient: 'дифеноконазол+цифлуфенамід', productName: 'Циделі Топ', category: 2, controls: { bacteriosis: false, phytophthora: true, rots: true, rootRots: false }, rateHome: '5 мл/10л', rateField: '2 л/га' },
+    { activeIngredient: 'дифеноконазол+цифлуфенамід', productName: 'Циделі Топ', category: 2, controls: { bacteriosis: false, phytophthora: false, rots: true, rootRots: false }, rateHome: '5 мл/10л', rateField: '2 л/га' },
     { activeIngredient: 'металаксил-м+манкоцеб', productName: 'Ридоміл Голд', category: 2, controls: { bacteriosis: true, phytophthora: true, rots: true, rootRots: false }, rateHome: '5 г/10л', rateField: '2,5 кг/га' },
     { activeIngredient: 'сірка', productName: 'Тіовіт Джет', category: 1, controls: { bacteriosis: false, phytophthora: false, rots: true, rootRots: false }, rateHome: '2,5 г/10л', rateField: '5 кг/га' },
     { activeIngredient: 'флуопірам+тебуконазол', productName: 'Луна Експірієнс', category: 2, controls: { bacteriosis: false, phytophthora: false, rots: true, rootRots: false }, rateHome: '2,5 мл/10л', rateField: '0,75 л/га' },

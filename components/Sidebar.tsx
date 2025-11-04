@@ -1,5 +1,3 @@
-
-
 import React from 'react';
 
 interface SidebarProps {
@@ -46,6 +44,16 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, onGoHome, onStartBui
                             <button onClick={onGoToIdentifier} className="w-full text-left px-4 py-3 rounded-md text-gray-700 font-semibold hover:bg-gray-100 hover:text-green-700 transition-colors">
                                 Визначити за фото
                             </button>
+                        </li>
+                        <li>
+                            <a 
+                                href="https://mepr.gov.ua/upravlinnya-vidhodamy/derzhavnyj-reyestr-pestytsydiv-i-agrohimikativ-dozvolenyh-do-vykorystannya-v-ukrayini/"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="block w-full text-left px-4 py-3 rounded-md text-gray-700 font-semibold hover:bg-gray-100 hover:text-green-700 transition-colors"
+                            >
+                                Перелік пестицидів
+                            </a>
                         </li>
                         <li>
                             <button onClick={onOpenAbout} className="w-full text-left px-4 py-3 rounded-md text-gray-700 font-semibold hover:bg-gray-100 hover:text-green-700 transition-colors">
