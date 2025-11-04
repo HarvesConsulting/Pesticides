@@ -127,7 +127,12 @@ const ProblemIdentifier: React.FC<ProblemIdentifierProps> = ({ cropNameMap, onBa
       const ai = new GoogleGenAI({ apiKey: process.env.API_KEY as string });
 
       const cropList = Object.values(CropType).join(', ');
-      const promptText = `Ідентифікуй рослину на цьому зображенні, а також будь-яку хворобу чи шкідника. Надай відповідь українською мовою. У полі 'crop' використовуй одне з цих значень: [${cropList}], або 'unknown', якщо не вдається визначити.`;
+      const promptText = `Проаналізуй зображення рослини. Ідентифікуй вид рослини та будь-які видимі хвороби чи шкідників. Надай відповідь українською мовою.
+- **crop**: Вид рослини. Має бути одним із цих значень: [${cropList}]. Якщо не впевнений або рослини немає у списку, використовуй 'unknown'.
+- **name**: Назва ідентифікованої хвороби, шкідника, або 'Здорова рослина', якщо проблем не виявлено.
+- **type**: Тип проблеми. Має бути 'disease', 'pest', або 'unknown'. Якщо рослина здорова, використовуй 'unknown'.
+- **description**: Короткий опис твоїх висновків.
+- **confidence**: Твоя впевненість в ідентифікації (від 0 до 100).`;
 
       const response = await ai.models.generateContent({
         model: 'gemini-2.5-flash',
@@ -147,11 +152,11 @@ const ProblemIdentifier: React.FC<ProblemIdentifierProps> = ({ cropNameMap, onBa
           responseSchema: {
             type: Type.OBJECT,
             properties: {
-                crop: { type: Type.STRING },
-                name: { type: Type.STRING },
-                type: { type: Type.STRING },
-                description: { type: Type.STRING },
-                confidence: { type: Type.NUMBER },
+                crop: { type: Type.STRING, description: `Вид рослини. Одне з: ${cropList}, unknown` },
+                name: { type: Type.STRING, description: 'Назва хвороби, шкідника, або "Здорова рослина".' },
+                type: { type: Type.STRING, description: "Тип проблеми: 'disease', 'pest', або 'unknown'." },
+                description: { type: Type.STRING, description: 'Детальний опис знайденої проблеми або стану рослини.' },
+                confidence: { type: Type.NUMBER, description: 'Впевненість в ідентифікації у відсотках (0-100).' },
             },
             required: ['crop', 'name', 'type', 'description', 'confidence'],
           },
