@@ -1,8 +1,6 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import { CameraIcon } from './icons/CameraIcon';
 import { UploadIcon } from './icons/UploadIcon';
-import AnalysisView from './AnalysisView';
-import { IdentificationResult, CropType } from '../types';
 
 const compressImage = (file: File, maxWidth = 1024, quality = 0.8): Promise<{blob: Blob, url: string}> => {
   return new Promise((resolve, reject) => {
@@ -35,11 +33,11 @@ const compressImage = (file: File, maxWidth = 1024, quality = 0.8): Promise<{blo
       
       ctx.drawImage(img, 0, 0, width, height);
       
+      const dataUrl = canvas.toDataURL('image/jpeg', quality);
       canvas.toBlob(
         (blob) => {
           if (blob) {
-            const url = URL.createObjectURL(blob);
-            resolve({blob, url});
+            resolve({blob, url: dataUrl});
           } else {
             reject(new Error('Canvas toBlob failed'));
           }
@@ -57,26 +55,17 @@ const compressImage = (file: File, maxWidth = 1024, quality = 0.8): Promise<{blo
   });
 };
 
+
 interface ProblemIdentifierProps {
-  cropNameMap: Record<CropType, string>;
-  onIdentificationComplete: (result: IdentificationResult) => void;
+  onImageReady: (blob: Blob, dataUrl: string) => void;
 }
 
-const ProblemIdentifier: React.FC<ProblemIdentifierProps> = ({ cropNameMap, onIdentificationComplete }) => {
-  const [processedImage, setProcessedImage] = useState<{ src: string; blob: Blob } | null>(null);
+const ProblemIdentifier: React.FC<ProblemIdentifierProps> = ({ onImageReady }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [inputKey, setInputKey] = useState<string>(`key-${Date.now()}`);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
-
-  useEffect(() => {
-    return () => {
-      if (processedImage?.src) {
-          URL.revokeObjectURL(processedImage.src);
-      }
-    };
-  }, [processedImage]);
 
   const handleFileTrigger = (useCamera: boolean) => {
     const input = fileInputRef.current;
@@ -96,46 +85,25 @@ const ProblemIdentifier: React.FC<ProblemIdentifierProps> = ({ cropNameMap, onId
     if (file) {
       setIsLoading(true);
       setError(null);
-      if (processedImage?.src) {
-        URL.revokeObjectURL(processedImage.src);
-      }
-      setProcessedImage(null);
 
       try {
         const { blob, url } = await compressImage(file);
-        setProcessedImage({ src: url, blob });
+        onImageReady(blob, url);
+        // Page will reload, so no need to set isLoading to false
       } catch (err: any) {
         console.error("Помилка обробки зображення:", err);
         setError('Не вдалося обробити зображення. Спробуйте інше фото.');
-        setInputKey(`key-error-${Date.now()}`);
-      } finally {
         setIsLoading(false);
+        setInputKey(`key-error-${Date.now()}`);
       }
     }
-    // Скидаємо ключ інпуту, щоб onChange спрацьовував надійно
     setInputKey(`key-change-${Date.now()}`);
   };
   
-  const handleReset = () => {
-    if (processedImage?.src) {
-        URL.revokeObjectURL(processedImage.src);
-    }
-    setProcessedImage(null);
+  const handleResetError = () => {
     setError(null);
     setIsLoading(false);
     setInputKey(`key-reset-${Date.now()}`);
-  }
-
-  if (processedImage) {
-    return (
-        <AnalysisView 
-            imageSrc={processedImage.src}
-            imageBlob={processedImage.blob}
-            cropNameMap={cropNameMap}
-            onIdentificationComplete={onIdentificationComplete}
-            onReset={handleReset} 
-        />
-    )
   }
 
   return (
@@ -154,13 +122,13 @@ const ProblemIdentifier: React.FC<ProblemIdentifierProps> = ({ cropNameMap, onId
       {isLoading ? (
         <div className="text-center py-6 sm:py-8">
           <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-green-600"></div>
-          <p className="mt-2 text-gray-600">Обробка фото...</p>
+          <p className="mt-2 text-gray-600">Обробка фото та перезавантаження...</p>
         </div>
       ) : error ? (
          <div className="text-center py-4 text-red-600 bg-red-50 p-3 rounded-lg border border-red-200 mt-4">
           {error}
           <button 
-            onClick={handleReset}
+            onClick={handleResetError}
             className="ml-3 text-red-700 hover:text-red-900 underline"
           >
             Спробувати знову
