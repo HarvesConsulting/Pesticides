@@ -6,7 +6,6 @@ import Footer from './components/Footer';
 import CropSelector from './components/CropSelector';
 import ProblemSelector from './components/ProblemSelector';
 import ResultsDisplay from './components/ResultsDisplay';
-import Stepper from './components/Stepper';
 import LandingPage from './components/LandingPage';
 import PlotTypeSelector from './components/PlotTypeSelector';
 import IntegratedSystemModal from './components/IntegratedSystemModal';
@@ -37,11 +36,20 @@ const App: React.FC = () => {
 
   const handleBack = () => {
     if (view === 'builder') {
-      if (currentStep > 1) {
-        setCurrentStep(currentStep - 1);
-      } else {
+      const prevStep = currentStep - 1;
+      if (prevStep < 1) {
         setView('plotTypeSelection');
+        return;
       }
+
+      if (currentStep === 3) { // going to 2
+        setSelectedProblem(null);
+        setIntegratedSystemPlan(null);
+      } else if (currentStep === 2) { // going to 1
+        setSelectedCrop(null);
+      }
+      setCurrentStep(prevStep);
+
     } else if (view === 'plotTypeSelection') {
       setView('landing');
     } else if (view === 'identifier') {
@@ -73,18 +81,6 @@ const App: React.FC = () => {
         setIsIntegratedModalOpen(true);
     } else {
         setCurrentStep(3);
-    }
-  };
-
-  const goToStep = (step: number) => {
-    if (step < currentStep) {
-      if (step === 1) {
-        setSelectedCrop(null);
-        setSelectedProblem(null);
-      } else if (step === 2) {
-        setSelectedProblem(null);
-      }
-      setCurrentStep(step);
     }
   };
 
@@ -375,12 +371,6 @@ const App: React.FC = () => {
     [ProblemType.Integrated]: "Інтегрована система захисту",
   };
 
-  const steps = [
-    { number: 1, title: 'Вибір культури' },
-    { number: 2, title: 'Вибір проблеми' },
-    { number: 3, title: 'Результати' },
-  ];
-
   const renderBuilderContent = () => {
     switch (currentStep) {
       case 1:
@@ -432,7 +422,6 @@ const App: React.FC = () => {
             return (
                 <>
                     <BackButton onClick={handleBack} />
-                    <Stepper steps={steps} currentStep={currentStep} goToStep={goToStep} />
                     <div className="bg-white p-6 sm:p-8 rounded-xl shadow-lg animate-fade-in">
                         {renderBuilderContent()}
                     </div>

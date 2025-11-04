@@ -2,7 +2,6 @@
 import React, { useState, useMemo } from 'react';
 import { CropType, PlotType, ProblemType, Fungicide, Insecticide, IdentificationResult } from '../types';
 import { cropData } from '../data';
-import Stepper from './Stepper';
 import CropSelector from './CropSelector';
 import PlotTypeSelector from './PlotTypeSelector';
 import ProblemSelector from './ProblemSelector';
@@ -30,32 +29,24 @@ const CollectiveAgronomistPage: React.FC<CollectiveAgronomistPageProps> = ({ onB
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const steps = [
-    { number: 1, title: 'Культура' },
-    { number: 2, title: 'Ділянка' },
-    { number: 3, title: 'Проблема' },
-    { number: 4, title: 'Результат' },
-  ];
-
-  const goToStep = (step: number) => {
-    if (step < currentStep) {
-        if (step === 1) {
-            setSelectedCrop(null);
-            setPlotType(null);
-            setSelectedProblem(null);
-            setIntegratedSystemPlan(null);
-        }
-        if (step === 2) {
-            setPlotType(null);
-            setSelectedProblem(null);
-            setIntegratedSystemPlan(null);
-        }
-         if (step === 3) {
-            setSelectedProblem(null);
-            setIntegratedSystemPlan(null);
-        }
-        setCurrentStep(step);
+  const handleBack = () => {
+    const prevStep = currentStep - 1;
+    if (prevStep < 1) {
+        onBackToLanding();
+        return;
     }
+
+    if (currentStep === 4) { // going to 3
+        setSelectedProblem(null);
+        setIntegratedSystemPlan(null);
+    }
+    if (currentStep === 3) { // going to 2
+        setPlotType(null);
+    }
+    if (currentStep === 2) { // going to 1
+        setSelectedCrop(null);
+    }
+    setCurrentStep(prevStep);
   };
   
   const handleSelectCrop = (crop: CropType) => {
@@ -208,8 +199,7 @@ const CollectiveAgronomistPage: React.FC<CollectiveAgronomistPageProps> = ({ onB
 
   return (
     <div className="container mx-auto px-4 py-8">
-      {showBackButton && <BackButton onClick={currentStep > 1 ? () => goToStep(currentStep - 1) : onBackToLanding} />}
-      <Stepper steps={steps} currentStep={currentStep} goToStep={goToStep} />
+      {showBackButton && <BackButton onClick={handleBack} />}
       <div className="mt-8">
         {renderStepContent()}
       </div>

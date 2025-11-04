@@ -8,21 +8,23 @@ interface HeaderProps {
 
 const Header: React.FC<HeaderProps> = ({ onHomeClick, onMenuClick }) => {
   return (
-    <header className="bg-white shadow-md sticky top-0 z-40">
-      <div className="container mx-auto px-4 py-3 flex justify-between items-center">
+    <header className="bg-white/80 backdrop-blur-md border-b border-gray-200 sticky top-0 z-40">
+      <div className="container mx-auto px-4 py-4 flex justify-between items-center">
         <div 
-          className="flex items-center cursor-pointer"
+          className="flex items-center cursor-pointer group"
           onClick={onHomeClick}
         >
-          <svg className="w-10 h-10 text-green-600 mr-3" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+          <svg className="w-11 h-11 text-green-600 mr-3 group-hover:scale-105 transition-transform duration-300" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
               <path d="M12 3a12 12 0 0 0 8.5 3a12 12 0 0 1 -8.5 15a12 12 0 0 1 -8.5 -15a12 12 0 0 0 8.5 -3" />
           </svg>
-          <h1 className="text-xl sm:text-2xl font-bold text-gray-800 hidden sm:block">Система Захисту Овочів</h1>
+          <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-green-600 to-emerald-600 hidden sm:block">
+            Система Захисту Овочів
+          </h1>
         </div>
         <div>
             <button 
               onClick={onMenuClick} 
-              className="p-2 rounded-full text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+              className="p-2 rounded-full text-gray-700 hover:bg-green-50 hover:text-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors"
               aria-label="Відкрити меню"
             >
                 <MenuIcon />
