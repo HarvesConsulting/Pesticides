@@ -1,6 +1,5 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { GoogleGenAI, Type } from "@google/genai";
-import imageCompression from 'browser-image-compression';
 import { CropType, IdentificationResult } from '../types';
 import { CameraIcon } from './icons/CameraIcon';
 import { UploadIcon } from './icons/UploadIcon';
@@ -26,6 +25,45 @@ const blobToBase64 = (blob: Blob): Promise<string> => {
   });
 };
 
+// Функція для стиснення зображення без використання бібліотеки
+const compressImage = (file: File, maxWidth = 1024, quality = 0.8): Promise<Blob> => {
+  return new Promise((resolve, reject) => {
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    const img = new Image();
+    
+    img.onload = () => {
+      let { width, height } = img;
+      
+      // Зменшуємо розмір якщо потрібно
+      if (width > maxWidth) {
+        height = (height * maxWidth) / width;
+        width = maxWidth;
+      }
+      
+      canvas.width = width;
+      canvas.height = height;
+      
+      ctx?.drawImage(img, 0, 0, width, height);
+      
+      canvas.toBlob(
+        (blob) => {
+          if (blob) {
+            resolve(blob);
+          } else {
+            reject(new Error('Canvas toBlob failed'));
+          }
+        },
+        'image/jpeg',
+        quality
+      );
+    };
+    
+    img.onerror = () => reject(new Error('Image loading failed'));
+    img.src = URL.createObjectURL(file);
+  });
+};
+
 const ProblemIdentifier: React.FC<ProblemIdentifierProps> = ({ cropNameMap, onBackToLanding, onIdentificationComplete }) => {
   const [imageSrc, setImageSrc] = useState<string | null>(null);
   const [imageBase64, setImageBase64] = useState<string | null>(null);
@@ -36,15 +74,32 @@ const ProblemIdentifier: React.FC<ProblemIdentifierProps> = ({ cropNameMap, onBa
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  // Перевірка підтримки браузером
+  useEffect(() => {
+    if (!window.FileReader) {
+      setError('Ваш браузер не підтримує завантаження файлів. Будь ласка, оновіть браузер.');
+    }
+  }, []);
+
   const handleFileTrigger = (useCamera: boolean) => {
     const input = fileInputRef.current;
     if (input) {
+        // Очищаємо попередні файли
+        input.value = '';
+        
         if (useCamera) {
+            // Для мобільних пристроїв
             input.setAttribute('capture', 'environment');
+            input.setAttribute('accept', 'image/*');
         } else {
             input.removeAttribute('capture');
+            input.setAttribute('accept', 'image/*');
         }
-        input.click();
+        
+        // Затримка для iOS
+        setTimeout(() => {
+            input.click();
+        }, 100);
     }
   };
 
@@ -57,6 +112,7 @@ const ProblemIdentifier: React.FC<ProblemIdentifierProps> = ({ cropNameMap, onBa
       setError(null);
       setResult(null);
       
+      // Очищення попередніх URL
       if (imageSrc && imageSrc.startsWith('blob:')) {
           URL.revokeObjectURL(imageSrc);
       }
@@ -64,21 +120,42 @@ const ProblemIdentifier: React.FC<ProblemIdentifierProps> = ({ cropNameMap, onBa
       setImageBase64(null);
 
       try {
-        const options = {
-          maxSizeMB: 1,
-          maxWidthOrHeight: 1024,
-          useWebWorker: false, // Use main thread for better compatibility on all devices
+        // Перевірка розміру файлу
+        if (file.size > 10 * 1024 * 1024) { // 10MB
+          setError('Файл занадто великий. Максимальний розмір: 10MB');
+          setIsLoading(false);
+          return;
         }
+
+        // Спрощена обробка з базовим стисненням
+        let processedBlob: Blob;
         
-        const compressedFile = await imageCompression(file, options);
-        const base64Data = await blobToBase64(compressedFile);
-        const previewUrl = URL.createObjectURL(compressedFile);
+        if (file.type.startsWith('image/') && !file.type.includes('gif')) {
+          try {
+            processedBlob = await compressImage(file, 1024, 0.7);
+          } catch (compressError) {
+            console.warn('Compression failed, using original file:', compressError);
+            processedBlob = file;
+          }
+        } else {
+          processedBlob = file;
+        }
+
+        const base64Data = await blobToBase64(processedBlob);
+        const previewUrl = URL.createObjectURL(processedBlob);
         
         setImageSrc(previewUrl);
         setImageBase64(base64Data);
       } catch (err: any) {
-        console.error("Повна помилка обробки зображення:", err);
-        const errorMessage = `Помилка обробки зображення: ${err.name} - ${err.message}. Спробуйте інше фото або перезавантажте сторінку.`;
+        console.error("Помилка обробки зображення:", err);
+        let errorMessage = 'Помилка обробки зображення. Спробуйте інше фото.';
+        
+        if (err.name === 'SecurityError') {
+          errorMessage = 'Помилка безпеки при обробці зображення. Спробуйте інше фото.';
+        } else if (err.name === 'EncodingError') {
+          errorMessage = 'Формат зображення не підтримується. Спробуйте JPG або PNG.';
+        }
+        
         setError(errorMessage);
       } finally {
         setIsLoading(false);
@@ -88,12 +165,20 @@ const ProblemIdentifier: React.FC<ProblemIdentifierProps> = ({ cropNameMap, onBa
 
   const handleIdentify = async () => {
     if (!imageBase64) return;
+    
+    // Перевірка API ключа
+    if (!process.env.API_KEY) {
+      setError('Помилка конфігурації: API ключ не налаштовано');
+      return;
+    }
+
     setIsLoading(true);
     setError(null);
-    setResult(null);
 
     try {
-      const ai = new GoogleGenAI({ apiKey: process.env.API_KEY as string });
+      const ai = new GoogleGenAI({ 
+        apiKey: process.env.API_KEY as string 
+      });
 
       const cropList = Object.values(CropType).join(', ');
       const promptText = `Проаналізуй зображення рослини. Ідентифікуй вид рослини та будь-які видимі хвороби чи шкідників. Надай відповідь українською мовою.
@@ -138,10 +223,20 @@ const ProblemIdentifier: React.FC<ProblemIdentifierProps> = ({ cropNameMap, onBa
 
     } catch (err) {
       console.error("ПОМИЛКА ІДЕНТИФІКАЦІЇ:", err);
-      let userMessage = 'Під час аналізу сталася помилка. Це може бути пов\'язано з тимчасовою проблемою на сервері або з контентом зображення. Будь ласка, спробуйте ще раз або використайте інше фото.';
-      if (err instanceof Error && err.message.includes('SAFETY')) {
-        userMessage = 'Зображення не вдалося обробити через налаштування безпеки. Спробуйте інше фото.';
+      let userMessage = 'Помилка аналізу. Перевірте підключення до інтернету та спробуйте ще раз.';
+      
+      if (err instanceof Error) {
+        if (err.message.includes('SAFETY')) {
+          userMessage = 'Зображення не пройшло перевірку безпеки. Спробуйте інше фото.';
+        } else if (err.message.includes('API_KEY') || err.message.includes('apiKey')) {
+          userMessage = 'Проблема з API ключем. Зверніться до адміністратора.';
+        } else if (err.message.includes('network') || err.message.includes('Network')) {
+          userMessage = 'Проблема з мережевим зʼєднанням. Перевірте інтернет.';
+        } else if (err.message.includes('quota') || err.message.includes('Quota')) {
+          userMessage = 'Перевищено ліміт запитів. Спробуйте пізніше.';
+        }
       }
+      
       setError(userMessage);
     } finally {
       setIsLoading(false);
@@ -156,12 +251,13 @@ const ProblemIdentifier: React.FC<ProblemIdentifierProps> = ({ cropNameMap, onBa
     setImageBase64(null);
     setResult(null);
     setError(null);
+    setIsLoading(false);
     setInputKey(`key-reset-${Date.now()}`);
   }
 
   return (
-    <div className="bg-white p-6 sm:p-8 rounded-xl shadow-lg animate-fade-in">
-      <h2 className="text-2xl md:text-3xl font-bold text-gray-800 mb-6 text-center">Визначити проблему за фото</h2>
+    <div className="bg-white p-4 sm:p-6 md:p-8 rounded-xl shadow-lg">
+      <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-800 mb-4 sm:mb-6 text-center">Визначити проблему за фото</h2>
       
       <input 
         key={inputKey}
@@ -173,31 +269,56 @@ const ProblemIdentifier: React.FC<ProblemIdentifierProps> = ({ cropNameMap, onBa
       />
 
       {!imageSrc && !isLoading && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-            <button onClick={() => handleFileTrigger(true)} className="p-8 rounded-lg border-2 border-dashed border-gray-300 hover:border-green-500 hover:bg-green-50 transition-colors flex flex-col items-center justify-center">
-                <CameraIcon className="w-12 h-12 text-gray-500 mb-2" />
-                <span className="font-semibold text-gray-700">Зробити фото</span>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4 mt-4">
+            <button 
+              onClick={() => handleFileTrigger(true)} 
+              className="p-4 sm:p-6 md:p-8 rounded-lg border-2 border-dashed border-gray-300 hover:border-green-500 hover:bg-green-50 transition-colors flex flex-col items-center justify-center min-h-[100px] sm:min-h-[120px] touch-manipulation"
+              disabled={isLoading}
+            >
+                <CameraIcon className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 text-gray-500 mb-2" />
+                <span className="font-semibold text-gray-700 text-sm sm:text-base">Зробити фото</span>
             </button>
-            <button onClick={() => handleFileTrigger(false)} className="p-8 rounded-lg border-2 border-dashed border-gray-300 hover:border-blue-500 hover:bg-blue-50 transition-colors flex flex-col items-center justify-center">
-                <UploadIcon className="w-12 h-12 text-gray-500 mb-2" />
-                <span className="font-semibold text-gray-700">Завантажити з галереї</span>
+            <button 
+              onClick={() => handleFileTrigger(false)} 
+              className="p-4 sm:p-6 md:p-8 rounded-lg border-2 border-dashed border-gray-300 hover:border-blue-500 hover:bg-blue-50 transition-colors flex flex-col items-center justify-center min-h-[100px] sm:min-h-[120px] touch-manipulation"
+              disabled={isLoading}
+            >
+                <UploadIcon className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 text-gray-500 mb-2" />
+                <span className="font-semibold text-gray-700 text-sm sm:text-base">Завантажити з галереї</span>
             </button>
         </div>
       )}
 
-      {isLoading && !imageSrc && <div className="text-center py-4">Обробка фото...</div>}
+      {isLoading && !imageSrc && (
+        <div className="text-center py-6 sm:py-8">
+          <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-green-600"></div>
+          <p className="mt-2 text-gray-600">Обробка фото...</p>
+        </div>
+      )}
       
       {imageSrc && (
-        <div className="space-y-6">
+        <div className="space-y-4 sm:space-y-6">
             <div className="w-full max-w-sm mx-auto">
-                <img src={imageSrc} alt="Preview" className="rounded-lg shadow-md w-full h-auto" />
+                <img 
+                  src={imageSrc} 
+                  alt="Preview" 
+                  className="rounded-lg shadow-md w-full h-auto max-h-[400px] object-contain" 
+                />
             </div>
             {!result && (
-                <div className="flex justify-center">
-                    <button onClick={handleIdentify} disabled={isLoading} className="bg-green-600 text-white font-bold py-3 px-8 rounded-lg hover:bg-green-700 transition-colors shadow-lg disabled:bg-gray-400 disabled:cursor-wait">
+                <div className="flex flex-col sm:flex-row justify-center gap-3 sm:gap-4">
+                    <button 
+                      onClick={handleIdentify} 
+                      disabled={isLoading}
+                      className="bg-green-600 text-white font-bold py-3 px-6 sm:px-8 rounded-lg hover:bg-green-700 transition-colors shadow-lg disabled:bg-gray-400 disabled:cursor-not-allowed min-h-[50px] touch-manipulation"
+                    >
                         {isLoading ? 'Аналіз...' : 'Аналізувати'}
                     </button>
-                     <button onClick={reset} disabled={isLoading} className="ml-4 bg-gray-200 text-gray-700 font-bold py-3 px-8 rounded-lg hover:bg-gray-300 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed">
+                    <button 
+                      onClick={reset} 
+                      disabled={isLoading}
+                      className="bg-gray-200 text-gray-700 font-bold py-3 px-6 sm:px-8 rounded-lg hover:bg-gray-300 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed min-h-[50px] touch-manipulation"
+                    >
                         Обрати інше
                     </button>
                 </div>
@@ -205,29 +326,57 @@ const ProblemIdentifier: React.FC<ProblemIdentifierProps> = ({ cropNameMap, onBa
         </div>
       )}
       
-      {isLoading && imageSrc && <div className="text-center py-4">Аналіз...</div>}
-      {error && <div className="text-center py-4 text-red-600 bg-red-50 p-3 rounded-lg">{error}</div>}
+      {isLoading && imageSrc && (
+        <div className="text-center py-6">
+          <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+          <p className="mt-2 text-gray-600">Аналіз зображення...</p>
+        </div>
+      )}
+      
+      {error && (
+        <div className="text-center py-4 text-red-600 bg-red-50 p-3 rounded-lg border border-red-200 mt-4">
+          {error}
+          <button 
+            onClick={reset}
+            className="ml-3 text-red-700 hover:text-red-900 underline"
+          >
+            Спробувати знову
+          </button>
+        </div>
+      )}
 
       {result && (
-        <div className="mt-8 border-t pt-6 text-center animate-fade-in">
-          <h3 className="text-2xl font-bold text-gray-800">Ідентифіковано: {result.name}</h3>
-          <p className="text-lg text-gray-600 mb-1">
+        <div className="mt-6 sm:mt-8 border-t pt-6 text-center">
+          <h3 className="text-xl sm:text-2xl font-bold text-gray-800 mb-4">Ідентифіковано: {result.name}</h3>
+          <div className="space-y-2 mb-4">
+            <p className="text-base sm:text-lg text-gray-600">
               Культура: <strong>{result.crop !== 'unknown' && cropNameMap[result.crop] ? cropNameMap[result.crop].replace(/ів$/, '') : 'Невизначено'}</strong>
-          </p>
-          <p className="text-sm text-gray-500 mb-4">(Впевненість: {result.confidence.toFixed(1)}%)</p>
-          <p className="text-gray-600 mb-6 max-w-xl mx-auto">{result.description}</p>
+            </p>
+            <p className="text-sm text-gray-500">Впевненість: {result.confidence.toFixed(1)}%</p>
+          </div>
+          <p className="text-gray-600 mb-6 max-w-xl mx-auto text-sm sm:text-base leading-relaxed">{result.description}</p>
 
           {result.crop !== 'unknown' && (result.type === 'disease' || result.type === 'pest') ? (
-            <button onClick={() => onIdentificationComplete(result)} className="bg-blue-600 text-white font-bold py-3 px-8 rounded-lg hover:bg-blue-700 transition-colors shadow-lg">
-                Знайти препарати для боротьби
+            <button 
+              onClick={() => onIdentificationComplete(result)} 
+              className="bg-blue-600 text-white font-bold py-3 px-6 sm:px-8 rounded-lg hover:bg-blue-700 transition-colors shadow-lg min-h-[50px] touch-manipulation"
+            >
+              Знайти препарати для боротьби
             </button>
           ) : (
-            <p className="text-orange-600 bg-orange-50 p-3 rounded-lg max-w-xl mx-auto">Не вдалося визначити культуру з довідника або класифікувати проблему. Рекомендації недоступні.</p>
+            <div className="bg-orange-50 border border-orange-200 rounded-lg p-4 max-w-xl mx-auto">
+              <p className="text-orange-700 text-sm sm:text-base">
+                Не вдалося визначити культуру з довідника або класифікувати проблему. Рекомендації недоступні.
+              </p>
+            </div>
           )}
 
-           <button onClick={reset} className="mt-4 text-sm text-gray-600 hover:underline">
-                Спробувати інше фото
-           </button>
+          <button 
+            onClick={reset} 
+            className="mt-4 text-sm text-gray-600 hover:text-gray-800 hover:underline transition-colors"
+          >
+            Спробувати інше фото
+          </button>
         </div>
       )}
     </div>
