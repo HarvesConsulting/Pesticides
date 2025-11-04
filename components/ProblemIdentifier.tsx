@@ -33,8 +33,8 @@ const resizeImage = (file: File): Promise<Blob> => {
     img.onload = () => {
       URL.revokeObjectURL(url); 
       const canvas = document.createElement('canvas');
-      const MAX_WIDTH = 300; // Even more aggressive reduction for mobile
-      const MAX_HEIGHT = 300; // Even more aggressive reduction for mobile
+      const MAX_WIDTH = 512;
+      const MAX_HEIGHT = 512;
       let width = img.width;
       let height = img.height;
 
@@ -65,7 +65,7 @@ const resizeImage = (file: File): Promise<Blob> => {
           }
         },
         'image/jpeg',
-        0.75 // Slightly lower quality
+        0.75
       );
     };
     img.onerror = (err) => {
@@ -169,7 +169,7 @@ const ProblemIdentifier: React.FC<ProblemIdentifierProps> = ({ cropNameMap, onBa
 
     } catch (err) {
       console.error("ПОМИЛКА ІДЕНТИФІКАЦІЇ:", err);
-      setError('Не вдалося розпізнати проблему. Спробуйте інше фото або перевірте з\'єднання. (Деталі в консолі розробника)');
+      setError('Не вдалося розпізнати проблему. Можливі причини: слабкий інтернет-сигнал або фото низької якості. Спробуйте зробити більш чітке фото або повторіть спробу пізніше.');
     } finally {
       setIsLoading(false);
     }
